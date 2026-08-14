@@ -30,7 +30,7 @@ export const register = async (req, res) => {
       passwordHash,
     });
     //   save user
-    user.save();
+    await user.save();
 
     return res.status(200).json({ message: "User created successfully" });
   } catch (error) {
@@ -55,7 +55,7 @@ export const login = async (req, res) => {
 
     const isValid = await bcrypt.compare(String(password), user.passwordHash);
     if (!isValid) {
-      return res.status(409).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const payload = {

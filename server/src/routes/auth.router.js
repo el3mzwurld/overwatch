@@ -8,7 +8,4 @@ const router = Router();
 router.post("/reg", register);
 router.post("/login", login);
 
-// middleware
-router.use(reqAuth);
-
 export default router;

@@ -25,8 +25,9 @@ const itemSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
-      min: [1, "Rating must be at least 1"],
+      min: [0, "Rating must be at least 1"],
       max: [10, "Rating must be at most 10"],
+      default: 0,
     },
     notes: {
       type: String,
