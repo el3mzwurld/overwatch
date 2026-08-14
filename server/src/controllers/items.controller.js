@@ -33,7 +33,7 @@ export const createItem = async (req, res) => {
     });
   }
   // check if it's in our type
-  const cats = ["movie", "book", "game"];
+  const cats = ["movie", "book", "game", "tv"];
   if (!cats.includes(category)) {
     return res.status(400).json({
       error: "Bad request : Please ensure you use a valid category",

@@ -9,7 +9,7 @@ const itemSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["movie", "book", "game"],
+      enum: ["movie", "book", "game", "tv"],
       trim: true,
       required: true,
     },
