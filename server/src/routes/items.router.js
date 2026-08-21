@@ -7,8 +7,15 @@ import {
   updateItem,
   getById,
 } from "../controllers/items.controller.js";
+import { getFilms, searchFilms } from "../controllers/tmdb.controller.js";
 
 const router = Router();
+
+//discover films
+router.get("/films", getFilms);
+// search films
+router.get("/films/search", searchFilms);
+
 // middleware
 router.use(reqAuth);
 
