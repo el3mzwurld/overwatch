@@ -67,3 +67,80 @@ export const normalizeShow = (show) => {
 
   return normalized;
 };
+
+export const normalikeBook = (work) => {
+  return {
+    externalId: work.key, // "/works/OL16813053W"
+    category: "book",
+    title: work.title,
+    authors: work.authors?.map((a) => a.name) || [],
+    publishDate: work.first_publish_year
+      ? String(work.first_publish_year)
+      : work.first_publish_date
+        ? work.first_publish_date
+        : null,
+    genres: work.subject || work.subjects || [],
+    images:
+      work.cover_id || work.covers || []
+        ? {
+            thumbnail: `https://covers.openlibrary.org/b/id/${work.cover_id}-M.jpg`,
+          }
+        : {},
+    externalUrl: `https://openlibrary.org${work.key}`,
+    bookDesc: "", // not present on this endpoint — filled in via getBookById
+    pageCount: null, // not present here either
+    metadata: {
+      averageRating: null, // requires separate ratings call
+      ratingsCount: null,
+    },
+  };
+};
+
+export const normalizeSearchedBook = (work) => {
+  const normalized = {
+    author: work.author_name,
+    image: work.cover_i,
+    publishDate: work.first_publish_year,
+    title: work.title,
+    externalId: work.key,
+    series: work.series_key ?? null,
+    metadata: {
+      averageRating: null,
+      ratingsCount: null,
+    },
+  };
+
+  return normalized;
+};
+
+export const normalizeGame = (result) => {
+  const normalized = {
+    externalId: result.id,
+    slug: result.slug,
+    name: result.name,
+    availablePlatforms: result.platforms,
+    availableStores: result.stores,
+    releaseDate: result.released,
+    image: result.background_image,
+    tags: result.tags,
+    esrbRating: result.esrb_rating,
+    genres: result.genres,
+    analytics: {
+      averageRating: result.rating,
+      ratingsAnalysis: result.ratings,
+      ratingsCount: result.ratings_count,
+      metacriticRating: result.metacritic,
+    },
+  };
+
+  return normalized;
+};
+export const DISCOVER_SUBJECTS = [
+  "fiction",
+  "action",
+  "adventure",
+  "mystery",
+  "science",
+  "biography",
+  "fantasy",
+];

@@ -16,16 +16,15 @@ const fetchTMDB = async (endpoint) => {
 export async function getFilms(req, res) {
   const page = Math.max(1, Number(req.query.page) || 1);
   try {
-    const [movieRes, showRes] = await Promise.all([
+    const [movieRes, showRes] = await Promise.allSettled([
       fetchTMDB(`/movie/popular?page=${page}`),
       fetchTMDB(`/tv/popular?page=${page}`),
     ]);
 
-    //   normalize films
-    const normalizedMovies = movieRes.results.map((m) => {
+    const normalizedMovies = movieRes.value.results.map((m) => {
       return normalizeMovie(m);
     });
-    const normalizedShows = showRes.results.map((s) => {
+    const normalizedShows = showRes.value.results.map((s) => {
       return normalizeShow(s);
     });
 
@@ -41,20 +40,13 @@ export async function getFilms(req, res) {
 export const searchFilms = async (req, res) => {
   const { q } = req.query;
 
-  const raw = req.query.page;
-
-  if (raw === undefined && !Number.isInteger(raw)) {
-    return res.status(400).json({ error: "Bad request" });
-  }
-
-  const page = Math.max(1, raw || 1);
   if (!q) {
     return res.status(400).json({ error: "Search query is required" });
   }
   try {
     const [movieRes, tvRes] = await Promise.allSettled([
-      fetchTMDB(`/search/movie?query=${encodeURIComponent(q)}&page=${page}`),
-      fetchTMDB(`/search/tv?query=${encodeURIComponent(q)}&page=${page}`),
+      fetchTMDB(`/search/movie?query=${encodeURIComponent(q)}`),
+      fetchTMDB(`/search/tv?query=${encodeURIComponent(q)}`),
     ]);
 
     // normalize movies and shows
@@ -73,7 +65,7 @@ export const searchFilms = async (req, res) => {
 
     const searchResults = [...movies, ...shows];
 
-    return res.json({ page, films: searchResults });
+    return res.json({ films: searchResults });
   } catch (error) {
     res.status(500).json({
       error: `Failed to fetch search results for this query: ${error.message}`,
