@@ -19,7 +19,7 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 databaseConfig();
 
 app.get("/", (req, res) => {
-  res.send({ message: "Hi, Welcome to LogX" });
+  res.send({ message: "Hi, Welcome to overwatch!" });
 });
 
 app.listen(process.env.PORT, () => {
