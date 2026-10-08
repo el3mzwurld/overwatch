@@ -131,6 +131,22 @@ export const normalizeGame = (result) => {
 
   return normalized;
 };
+export const normalizeSearchedGame = (result) => {
+  const normalized = {
+    externalId: result.id,
+    slug: result.slug,
+    name: result.name,
+    releaseDate: result.released,
+    image: result.background_image,
+    esrbRating: result.esrb_rating,
+    analytics: {
+      averageRating: result.rating,
+      metacriticRating: result.metacritic,
+    },
+  };
+
+  return normalized;
+};
 export const DISCOVER_SUBJECTS = [
   "fiction",
   "action",

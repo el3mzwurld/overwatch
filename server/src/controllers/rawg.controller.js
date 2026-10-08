@@ -1,5 +1,5 @@
 import axios from "axios";
-import { normalizeGame } from "../utils/utils.js";
+import { normalizeGame, normalizeSearchedGame } from "../utils/utils.js";
 
 const RAWG_KEY = process.env.RAWG_KEY;
 const base_url = "https://api.rawg.io/api";
@@ -55,7 +55,8 @@ export const getGame = async (req, res) => {
   const endpoint = `/games/${encodeURIComponent(slug)}?key=${RAWG_KEY}`;
   try {
     const data = await fetchRawg(endpoint);
-    res.status(200).json({ message: "Success", results: data });
+    const norm = normalizeGame(data);
+    res.status(200).json({ message: "Success", results: norm });
   } catch (error) {
     res.status(200).json({ error: error.message, cause: error.cause });
     console.log(error.message);
@@ -68,7 +69,7 @@ export const discoverByGenre = async (req, res) => {
   const endpoint = `/games?genres=${genre}&key=${RAWG_KEY}`;
   try {
     const data = await fetchRawg(endpoint);
-    const normalized = data.results.map((raw) => normalizeGame(raw));
+    const normalized = data.results.map((raw) => normalizeSearchedGame(raw));
     res
       .status(200)
       .json({ message: "Success", results: normalized, nextPage: data.next });
@@ -88,7 +89,7 @@ export const searchGame = async (req, res) => {
   const endpoint = `/games?search=${encodeURIComponent(search)}&key=${RAWG_KEY}`;
   try {
     const data = await fetchRawg(endpoint);
-    const normalized = data.results.map((raw) => normalizeGame(raw));
+    const normalized = data.results.map((raw) => normalizeSearchedGame(raw));
     res
       .status(200)
       .json({ message: "Success", results: normalized, nextPage: data.next });
