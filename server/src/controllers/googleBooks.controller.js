@@ -1,4 +1,8 @@
-import { DISCOVER_SUBJECTS, normalikeBook } from "../utils/utils.js";
+import {
+  DISCOVER_SUBJECTS,
+  normalikeBook,
+  normalizeSearchedBook,
+} from "../utils/utils.js";
 const BASE_URL = "https://openlibrary.org";
 
 const fetchOpenLib = async (endpoint = "") => {
@@ -84,8 +88,8 @@ export const searchBook = async (req, res) => {
 
   try {
     const data = await fetchOpenLib(endpoint);
-    const results = normalikeBook(data.docs);
-    return res.status(200).json({ query: query, data });
+    const results = await data.docs.map((raw) => normalizeSearchedBook(raw));
+    return res.status(200).json({ query: query, results });
   } catch (error) {
     console.error(error.message, error.cause);
     res.status(500).json({ error: error.message });
