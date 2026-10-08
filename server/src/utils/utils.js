@@ -85,7 +85,7 @@ export const normalikeBook = (work) => {
         ? {
             thumbnail: `https://covers.openlibrary.org/b/id/${work.cover_id}-M.jpg`,
           }
-        : {},
+        : null,
     externalUrl: `https://openlibrary.org${work.key}`,
     bookDesc: "", // not present on this endpoint — filled in via getBookById
     pageCount: null, // not present here either
