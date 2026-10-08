@@ -65,13 +65,47 @@ export const login = async (req, res) => {
     // sign token
     const token = signToken(payload);
     //   get showable user property
-    const { passwordHash, ...passedUser } = user.toObject();
+    const { passwordHash, ...u } = user.toObject();
 
+    const refined = {
+      id: u._id,
+      createdAt: u.createdAt,
+      email: u.email,
+      userName: u.userName,
+    };
     res
       .status(200)
-      .json({ message: "Login Successful", user: passedUser, token: token });
+      .json({ message: "Login Successful", user: refined, token: token });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
     console.log(error.message);
+  }
+};
+
+export const getUser = async (req, res) => {
+  // get user from middleware
+  const userId = req.user.id;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Not logged in." });
+  }
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(401).json({ error: "User doesn't exist." });
+    }
+
+    const { passwordHash, ...u } = user.toObject();
+    const refined = {
+      id: u._id,
+      createdAt: u.createdAt,
+      email: u.email,
+      userName: u.userName,
+    };
+    res.status(200).json({ message: "session active", user: refined });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Something went wrong, we couldn't verify you." });
   }
 };
