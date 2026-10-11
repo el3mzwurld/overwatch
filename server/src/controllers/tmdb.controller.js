@@ -1,12 +1,16 @@
 import { normalizeMovie, normalizeShow } from "../utils/utils.js";
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
-
+const tmdb_key = process.env.TMDB_AUTH_HEADER;
 const fetchTMDB = async (endpoint) => {
   // build the url
-  const url = `${TMDB_BASE_URL}${endpoint}&api_key=${process.env.TMDB_KEY}`;
+  const url = `${TMDB_BASE_URL}${endpoint}`;
   // fetch from the api
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${tmdb_key}`,
+    },
+  });
 
   if (!res.ok) throw new Error(`TMDB Request Failed, ${res.status}`);
   const data = await res.json();
@@ -33,11 +37,9 @@ export async function getFilms(req, res) {
 
     return res.json({ films: normalizedFilms, page });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: `Failed to fetch films: ${error.message}, ${error.cause}`,
-      });
+    res.status(500).json({
+      error: `Failed to fetch films: ${error.message}, ${error.cause}`,
+    });
   }
 }
 
