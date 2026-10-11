@@ -110,7 +110,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       logout();
       return;
     }
-
     setIsInitializing(true);
     try {
       const response = await axiosInstance.get("/auth/me");
@@ -136,7 +135,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   function logout() {
     setUser(null);
-    setIsLoading(false);
+    setIsInitializing(false);
     deleteToken();
   }
 

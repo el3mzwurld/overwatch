@@ -72,3 +72,31 @@ export const searchFilms = async (req, res) => {
     });
   }
 };
+
+export const getFilm = async (req, res) => {
+  const { id, type } = req.query;
+  if (!id || !type) {
+    return res.status(400).json({
+      error:
+        "Bad request: The film id and film type is required to access this endpoint",
+    });
+  }
+
+  if (type !== "movie" || type !== tv) {
+    return res.status(400).json({
+      error:
+        "Bad Request : Critical Error : query param type must only be movie or tv",
+    });
+  }
+  const endpoint = `/${type === "movie" ? "movie" : "tv"}/${id}`;
+
+  try {
+    let result;
+    const data = await fetchTMDB(endpoint);
+    if (type === "movie") {
+      result = data.movieres;
+    }
+  } catch (error) {}
+};
+
+export const getFilmDetails = async (req, res) => {};
