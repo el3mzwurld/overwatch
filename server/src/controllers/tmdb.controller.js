@@ -33,7 +33,11 @@ export async function getFilms(req, res) {
 
     return res.json({ films: normalizedFilms, page });
   } catch (error) {
-    res.status(500).json({ error: `Failed to fetch films: ${error.message}` });
+    res
+      .status(500)
+      .json({
+        error: `Failed to fetch films: ${error.message}, ${error.cause}`,
+      });
   }
 }
 
