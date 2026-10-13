@@ -1,4 +1,9 @@
-import { normalizeMovie, normalizeShow } from "../utils/utils.js";
+import {
+  normalizeFullMovie,
+  normalizeFullShow,
+  normalizeMovie,
+  normalizeShow,
+} from "../utils/utils.js";
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const tmdb_key = process.env.TMDB_AUTH_HEADER;
@@ -80,7 +85,9 @@ export const searchFilms = async (req, res) => {
 };
 
 export const getFilm = async (req, res) => {
-  const { id, type } = req.query;
+  const id = req.params.id;
+  const type = req.query.type;
+  console.log(type);
   if (!id || !type) {
     return res.status(400).json({
       error:
@@ -88,21 +95,27 @@ export const getFilm = async (req, res) => {
     });
   }
 
-  if (type !== "movie" || type !== tv) {
+  const typeSet = new Set(["movie", "tv"]);
+  if (!typeSet.has(String(type))) {
     return res.status(400).json({
       error:
         "Bad Request : Critical Error : query param type must only be movie or tv",
     });
   }
-  const endpoint = `/${type === "movie" ? "movie" : "tv"}/${id}`;
-
+  const endpoint = `/${type === "movie" ? "movie" : "tv"}/${id}?language=en-US`;
+  let result;
   try {
-    let result;
     const data = await fetchTMDB(endpoint);
     if (type === "movie") {
-      result = data.movieres;
+      result = normalizeFullMovie(data);
+    } else {
+      result = normalizeFullShow(data);
     }
-  } catch (error) {}
-};
 
-export const getFilmDetails = async (req, res) => {};
+    return res.status(200).json({ results: result });
+  } catch (error) {
+    res.status(500).json({
+      error: `Failed to fetch search results for this query: ${error.message}`,
+    });
+  }
+};

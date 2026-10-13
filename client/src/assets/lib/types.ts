@@ -24,6 +24,44 @@ export type Film = {
   };
 };
 
+export type FullMovie = {
+  externalId: string;
+  category: "movie";
+  title: string;
+  releaseDate: string;
+  posterUrl: string;
+  backdrop: string;
+  overview: string;
+  runtime: string;
+  releaseStatus: string;
+  metaData: {
+    voteAverage: number;
+    genres: { id: number; name: string }[];
+  };
+};
+
+export type FullTvShow = {
+  externalId: string;
+  category: "tv";
+  title: string;
+  releaseDate: string;
+  posterUrl: string;
+  backdrop: string;
+  overview: string;
+  runtime: string;
+  releaseStatus: string;
+  seasonCount: number;
+  networks: {
+    id: number;
+    logo_path: string;
+    name: string;
+    origin_country: string;
+  }[];
+  metaData: {
+    voteAverage: number;
+    genres: { id: number; name: string }[];
+  };
+};
 export type Book = {
   externalId: string;
   category: "book";

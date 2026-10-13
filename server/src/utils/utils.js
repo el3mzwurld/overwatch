@@ -68,6 +68,50 @@ export const normalizeShow = (show) => {
   return normalized;
 };
 
+export const normalizeFullShow = (show) => {
+  const normalized = {
+    externalId: `tv-${show.id}`,
+    category: "tv",
+    title: show.name,
+    releaseDate: show.first_air_date,
+    posterUrl: show.poster_path ? `${TMDB_IMG_URL}${show.poster_path}` : null,
+    overview: show.overview,
+    externalUrl: `https://www.themoviedb.org/tv/${show.id}`,
+    backdrop: show.backdrop_path,
+    seasonCount: show.number_of_seasons,
+    releaseStatus: show.status,
+    networks: show.networks,
+    metadata: {
+      voteAverage: show.vote_average,
+      genreIds: show.genre_ids,
+    },
+  };
+
+  return normalized;
+};
+export const normalizeFullMovie = (movie) => {
+  const normalized = {
+    externalId: `movie-${movie.id}`,
+    category: "movie",
+    title: movie.name,
+    releaseDate: movie.release_date,
+    posterUrl: movie.poster_path ? `${TMDB_IMG_URL}${movie.poster_path}` : null,
+    backdrop: movie.backdrop_path
+      ? `${TMDB_IMG_URL}${movie.backdrop_path}`
+      : null,
+    overview: movie.overview,
+    externalUrl: `https://www.themoviedb.org/movie/${movie.id}`,
+    runtime: movie.runtime,
+    releaseStatus: movie.status,
+    metadata: {
+      voteAverage: movie.vote_average,
+      genres: movie.genres,
+    },
+  };
+
+  return normalized;
+};
+
 export const normalikeBook = (work) => {
   return {
     externalId: work.key, // "/works/OL16813053W"

@@ -7,7 +7,11 @@ import {
   updateItem,
   getById,
 } from "../controllers/items.controller.js";
-import { getFilms, searchFilms } from "../controllers/tmdb.controller.js";
+import {
+  getFilm,
+  getFilms,
+  searchFilms,
+} from "../controllers/tmdb.controller.js";
 import {
   discoverBooks,
   getBook,
@@ -26,6 +30,7 @@ const router = Router();
 router.get("/films", getFilms);
 // search films
 router.get("/films/search", searchFilms);
+router.get("/films/:id", getFilm);
 // discover books
 router.get("/books", discoverBooks);
 // get book
