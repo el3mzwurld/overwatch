@@ -163,3 +163,18 @@ type RAWGAnalytics = {
   ratingsCount: number;
   metacriticRating: number;
 };
+
+export type Item = {
+  userId: string;
+  category: "movie" | "book" | "game" | "tv";
+  title: string;
+  status: "want" | "in progress" | "finished" | "dropped";
+  rating: number;
+  notes: string;
+  externalId: string;
+  link: string;
+};
+
+export type Playlist = {
+  items: Item[];
+};

@@ -48,7 +48,7 @@ router.get("/games/:slug", getGame);
 // create item
 router.post("/add", reqAuth, createItem);
 // get all items
-router.get("/", reqAuth, fetchItems);
+router.get("/lib", reqAuth, fetchItems);
 // patch an item
 router.patch("/edit/:id", updateItem);
 // delete an item

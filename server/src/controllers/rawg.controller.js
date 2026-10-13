@@ -64,7 +64,7 @@ export const getGame = async (req, res) => {
 };
 
 export const discoverByGenre = async (req, res) => {
-  const genre = req.query.genre || "spider";
+  const genre = req.query.genre || "action";
 
   const endpoint = `/games?genres=${genre}&key=${RAWG_KEY}`;
   try {
@@ -80,19 +80,21 @@ export const discoverByGenre = async (req, res) => {
 };
 
 export const searchGame = async (req, res) => {
-  const { search } = req.query;
+  const { search, page } = req.query;
 
   if (!search || !String(search)) {
     return res.status(400).json({ error: "Bad request" });
   }
 
-  const endpoint = `/games?search=${encodeURIComponent(search)}&key=${RAWG_KEY}`;
+  let pageNo = page ?? 1;
+
+  const endpoint = `/games?search=${encodeURIComponent(search)}&page=${pageNo}&key=${RAWG_KEY}`;
   try {
     const data = await fetchRawg(endpoint);
     const normalized = data.results.map((raw) => normalizeSearchedGame(raw));
     res
       .status(200)
-      .json({ message: "Success", results: normalized, nextPage: data.next });
+      .json({ message: "Success", results: normalized, nextPage: pageNo + 1 });
   } catch (error) {
     res.status(200).json({ error: error.message, cause: error.cause });
     console.log(error.message);

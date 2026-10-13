@@ -1,5 +1,4 @@
 import { Item } from "./../models/item.model.js";
-import mongoose from "mongoose";
 
 // get items
 export const fetchItems = async (req, res) => {
@@ -61,9 +60,16 @@ export const createItem = async (req, res) => {
   try {
     //   create the item
     const item = new Item(newItem);
+    // check if the item exists inside the collection
+    const hasItem = await Item.exists({ externalId: externalId });
+    if (hasItem) {
+      return res
+        .status(409)
+        .json({ error: "Conflict : This item already exists" });
+    }
     //   save the item
     await item.save();
-    res.status(201).json({ message: "success", item: item });
+    res.status(200).json({ message: "success", item: item });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
     console.error(error.message);

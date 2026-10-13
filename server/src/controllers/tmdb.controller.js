@@ -112,7 +112,7 @@ export const getFilm = async (req, res) => {
       result = normalizeFullShow(data);
     }
 
-    return res.status(200).json({ results: result });
+    return res.status(200).json({ result });
   } catch (error) {
     res.status(500).json({
       error: `Failed to fetch search results for this query: ${error.message}`,

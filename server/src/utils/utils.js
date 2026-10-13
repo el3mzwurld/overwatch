@@ -67,7 +67,6 @@ export const normalizeShow = (show) => {
 
   return normalized;
 };
-
 export const normalizeFullShow = (show) => {
   const normalized = {
     externalId: `tv-${show.id}`,
@@ -111,7 +110,6 @@ export const normalizeFullMovie = (movie) => {
 
   return normalized;
 };
-
 export const normalikeBook = (work) => {
   return {
     externalId: work.key, // "/works/OL16813053W"
@@ -139,7 +137,6 @@ export const normalikeBook = (work) => {
     },
   };
 };
-
 export const normalizeSearchedBook = (work) => {
   const normalized = {
     author: work.author_name,
@@ -152,7 +149,6 @@ export const normalizeSearchedBook = (work) => {
 
   return normalized;
 };
-
 export const normalizeGame = (result) => {
   const normalized = {
     externalId: result.id,

@@ -35,10 +35,6 @@ const itemSchema = new mongoose.Schema(
     externalId: {
       type: String,
     },
-    metadata: {
-      type: mongoose.Schema.Types.Mixed,
-      default: {},
-    },
     link: {
       type: String,
     },
