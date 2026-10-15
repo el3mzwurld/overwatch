@@ -7,7 +7,7 @@ overwatch is a personal hobby logger. The v1 goal is simple: let a user browse *
 This repository is named `overwatch`; the product is **overwatch**.
 
 - **Backend:** Node.js + Express + MongoDB (`/server`), deployed on Render
-- **Frontend:** React + Vite (`/client`, scaffolding in progress)
+- **Frontend:** React + Vite (`/client`, UI component construction in progress 👷🏻‍♀️)
 - **Live API:** https://overwatch-m4jq.onrender.com
 
 ---
