@@ -12,3 +12,15 @@ export const getToken = (): string | null => {
 export const deleteToken = () => {
   localStorage.removeItem(tok_store);
 };
+
+export const paginator = <T>(
+  arr: Array<T>,
+  page: number,
+  limit: number,
+): Array<T> => {
+  const totalItems = arr.length;
+
+  const end = Math.min(page * limit, totalItems);
+
+  return arr.slice(0, end);
+};
