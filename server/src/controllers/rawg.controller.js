@@ -18,7 +18,7 @@ const fetchRawg = async (endpoint = "") => {
 };
 
 export const discoverDefaultGames = async (req, res) => {
-  const { page } = req.query;
+  const { page, limit } = req.query;
 
   let pageNum = page;
   if (!page) {
@@ -27,7 +27,7 @@ export const discoverDefaultGames = async (req, res) => {
 
   const minimum_rating = 80;
   const highest_rating = 100;
-  const page_size = 10;
+  const page_size = limit ?? 60;
 
   const endpoint = `/games?page=${pageNum}&metacritic=${minimum_rating},${highest_rating}&page_size=${page_size}&key=${RAWG_KEY}`;
 

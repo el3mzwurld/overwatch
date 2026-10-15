@@ -5,7 +5,7 @@ import { searchBook } from "../api/api";
 import { paginator } from "../assets/lib/utils";
 
 const DISCOVER_PAGE_LIMIT = 12;
-export function BookSearch(query: string) {
+export function UseBookSearch(query: string) {
   const debouncedQuery = useDebouncer(query.trim(), 400);
   const [page, setPage] = useState(1);
 
@@ -20,10 +20,11 @@ export function BookSearch(query: string) {
   const books = q.data ?? [];
 
   return {
-    gameSearchResults: paginator(books, page, DISCOVER_PAGE_LIMIT),
+    books: paginator(books, page, DISCOVER_PAGE_LIMIT),
     isLoading: q.isLoading,
     error: q.error,
     loadMore: () => setPage((p) => p + 1),
     hasMore: () => page * DISCOVER_PAGE_LIMIT < books.length,
+    isPending: q.isPending,
   };
 }

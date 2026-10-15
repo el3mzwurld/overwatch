@@ -1,16 +1,21 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useFilmSearch } from "./hooks/useFilmSearch";
+import { UseBookSearch } from "./hooks/useBookSearch";
 
 function App() {
-  const queryClient = useQueryClient();
+  const { books, isLoading, isPending } = UseBookSearch("Harry Potter");
 
-  const { items, isLoading, isPending } = useFilmSearch("spider");
-
-  if (isLoading) {
+  if (isLoading || isPending) {
     return <h3>...loading</h3>;
   }
 
-  return <>{items.map((item) => item.externalId)}</>;
+  return (
+    <div>
+      <ul>
+        {books.map((item) => (
+          <li key={item.externalId}>{item.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export default App;

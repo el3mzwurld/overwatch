@@ -24,3 +24,5 @@ export const paginator = <T>(
 
   return arr.slice(0, end);
 };
+
+export const DISCOVERY_PAGE_LIMIT = 12;

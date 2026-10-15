@@ -153,10 +153,15 @@ export async function getBookById(id: string): Promise<Book> {
 }
 
 // game endpoints
-export async function getGames(): Promise<Game[]> {
+export async function discoverGames(
+  page?: number,
+  limit?: number,
+): Promise<Game[]> {
   try {
     // VERIFY(backend): discoverDefaultGames returns { results: Game[] }
-    const res = await axiosInstance.get("/items/games");
+    const res = await axiosInstance.get("/items/games", {
+      params: { page: page ?? 1, limit: limit ?? 12 },
+    });
     const data: Game[] = res.data.results;
     return data;
   } catch (error) {
