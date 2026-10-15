@@ -25,5 +25,6 @@ export function useFilmSearch(query: string) {
     loadMore: () => setPage((p) => p + 1),
     isLoading: q.isLoading,
     error: q.error,
+    isPending: q.isPending,
   };
 }

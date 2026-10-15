@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import * as dotenv from "dotenv/config";
 import dns from "dns";
 import { databaseConfig } from "./src/config/dbConfig.js";
@@ -6,6 +7,8 @@ import authRouter from "./src/routes/auth.router.js";
 import itemsRouter from "./src/routes/items.router.js";
 const app = express();
 
+// cors middleware
+app.use(cors({ origin: ["http://localhost:5173"] }));
 // express middleware
 app.use(express.json());
 // authentication
