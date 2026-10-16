@@ -1,24 +1,15 @@
-import { Route, Routes } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { Nav } from "../components/ui/nav";
+import { Box } from "@mui/material";
+import { Container } from "./../components/ui/container";
 
-// check if a user is logged in..if not, return them to the authentication screen
-
-const ProtectedRoute = () => {
-  return <></>;
-};
-
-//
-export const Approuter = () => {
+export const Home = () => {
   return (
-    <Routes>
-      <Route path="/" />
-      <Route path="/search" />
-      <Route path="/auth" />
-
-      {/* only authenticated users */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/playlists" />
-        <Route path="/playlist/:id" />
-      </Route>
-    </Routes>
+    <Box sx={{ width: "100%", height: "100vh", position: "relative" }}>
+      <Container>
+        <Outlet />
+      </Container>
+      <Nav />
+    </Box>
   );
 };

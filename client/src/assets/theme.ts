@@ -8,22 +8,23 @@ export const appTheme = createTheme({
     light: {
       palette: {
         primary: { main: "#f3f2f1" },
-        secondary: { main: "#2f2f2e" },
+        secondary: { main: "#8e7cc0" },
+
         background: {
-          default: "#262627",
+          default: "#f1f1f9",
           paper: "#e4e4e8",
         },
         text: {
-          primary: "#fff",
+          primary: "#2f2f2e",
         },
       },
     },
     dark: {
       palette: {
         primary: { main: "#2f2f2e" },
-        secondary: { main: "#f3f2f1" },
+        secondary: { main: "#56496b" },
         background: {
-          default: "#f1f1f9",
+          default: "#262627",
           paper: "#e4e4e8",
         },
         text: {

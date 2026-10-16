@@ -11,13 +11,13 @@ import { deleteToken, getToken, setToken } from "../assets/lib/utils";
 import axios from "axios";
 
 type UserContextType = {
+  user: User | null;
   login: (email: string, password: string) => Promise<AuthResponse>;
   signUp: (
     email: string,
     username: string,
     password: string,
   ) => Promise<AuthResponse>;
-  user: User | null;
   logout: () => void;
   isSubmitting: boolean;
   error?: string;
