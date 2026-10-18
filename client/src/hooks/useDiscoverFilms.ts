@@ -21,5 +21,6 @@ export const useDiscoverFilms = () => {
     error: q.error,
     hasMore: page * DISCOVERY_PAGE_LIMIT < films.length,
     loadMore: () => setPage((p) => p + 1),
+    page,
   };
 };

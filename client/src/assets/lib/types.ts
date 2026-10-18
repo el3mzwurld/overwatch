@@ -90,6 +90,7 @@ export type BookSearchResult = {
 
 export type Game = {
   externalId: number;
+  category: "game";
   slug: string;
   name: string;
   availablePlatforms: RAWGPlatfom[];

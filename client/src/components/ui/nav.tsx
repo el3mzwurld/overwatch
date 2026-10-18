@@ -46,8 +46,8 @@ export const Nav = () => {
       >
         <HouseRounded
           sx={{
-            width: { xs: 35 },
-            height: { xs: 35 },
+            width: { xs: 25 },
+            height: { xs: 25 },
             color: "secondary.main",
           }}
         />
@@ -61,8 +61,8 @@ export const Nav = () => {
       >
         <SearchRounded
           sx={{
-            width: { xs: 35 },
-            height: { xs: 35 },
+            width: { xs: 25 },
+            height: { xs: 25 },
             color: "secondary.main",
           }}
         />
@@ -76,8 +76,8 @@ export const Nav = () => {
       >
         <LibraryBooksRounded
           sx={{
-            width: { xs: 35 },
-            height: { xs: 35 },
+            width: { xs: 25 },
+            height: { xs: 25 },
             color: "secondary.main",
           }}
         />
