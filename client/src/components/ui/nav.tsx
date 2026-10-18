@@ -3,12 +3,13 @@ import {
   LibraryBooksRounded,
   SearchRounded,
 } from "@mui/icons-material";
-import { Box, useTheme } from "@mui/material";
+import { Box, useColorScheme, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 export const Nav = () => {
   const theme = useTheme();
   const navigator = useNavigate();
+  const { mode } = useColorScheme();
   return (
     <Box
       role="navigation"
@@ -24,6 +25,9 @@ export const Nav = () => {
           borderTop: "1px solid",
           borderTopColor: "secondary.main",
           backgroundColor: "primary.main",
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
+          boxShadow: `0px -10px 10px ${mode === "light" ? "#0000000f" : "#47337c44"}`,
         },
         minHeight: { xs: 80 },
         py: { xs: 1.5 },

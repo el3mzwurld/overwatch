@@ -8,11 +8,10 @@ export const appTheme = createTheme({
     light: {
       palette: {
         primary: { main: "#f3f2f1" },
-        secondary: { main: "#8e7cc0" },
+        secondary: { main: "#2f2f2e" },
 
         background: {
           default: "#f1f1f9",
-          paper: "#e4e4e8",
         },
         text: {
           primary: "#2f2f2e",
@@ -22,15 +21,17 @@ export const appTheme = createTheme({
     dark: {
       palette: {
         primary: { main: "#2f2f2e" },
-        secondary: { main: "#56496b" },
+        secondary: { main: "#f3f2f1" },
         background: {
           default: "#262627",
-          paper: "#e4e4e8",
         },
         text: {
           primary: "#fff",
         },
       },
     },
+  },
+  typography: {
+    fontFamily: "Noto Sans, Poppins, sans-serif",
   },
 });

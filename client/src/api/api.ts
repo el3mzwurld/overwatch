@@ -151,7 +151,6 @@ export async function getBookById(id: string): Promise<Book> {
     );
   }
 }
-
 // game endpoints
 export async function discoverGames(
   page?: number,
