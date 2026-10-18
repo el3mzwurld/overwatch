@@ -152,6 +152,7 @@ export const normalizeSearchedBook = (work) => {
 export const normalizeGame = (result) => {
   const normalized = {
     externalId: result.id,
+    category : "game",
     slug: result.slug,
     name: result.name,
     availablePlatforms: result.platforms,
@@ -174,6 +175,7 @@ export const normalizeGame = (result) => {
 export const normalizeSearchedGame = (result) => {
   const normalized = {
     externalId: result.id,
+    category : "game",
     slug: result.slug,
     name: result.name,
     releaseDate: result.released,
