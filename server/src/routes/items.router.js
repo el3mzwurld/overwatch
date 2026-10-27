@@ -16,7 +16,7 @@ import {
   discoverBooks,
   getBook,
   searchBook,
-} from "../controllers/googleBooks.controller.js";
+} from "../controllers/openLib.controller.js";
 import {
   discoverByGenre,
   discoverDefaultGames,
