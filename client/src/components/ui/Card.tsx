@@ -139,6 +139,7 @@ export const SearchCard = ({
   caegory,
   onClick,
 }: SearchCardProps) => {
+  console.log(cardData);
   const theme = useTheme();
   const title = () => {
     if (isGameSearchResult(cardData)) {
@@ -154,12 +155,11 @@ export const SearchCard = ({
       return cardData.publishDate;
     }
     if (isGameSearchResult(cardData)) {
-      return cardData.releaseDate;
+      return cardData.releaseDate ? cardData.releaseDate.split("-")[0] : "";
     }
-    return cardData?.releaseDate;
+    return cardData?.releaseDate.split("-")[0];
   };
-
-  const date = releaseDate()?.split("-")[0];
+  const date = releaseDate();
   const getImg = () => {
     if (isGameSearchResult(cardData)) {
       return cardData.image;
@@ -170,7 +170,6 @@ export const SearchCard = ({
     return cardData?.posterUrl;
   };
 
-  console.log(getImg());
   return (
     <MotionStack
       className="search-card"

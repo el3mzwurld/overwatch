@@ -67,7 +67,7 @@ export type Book = {
   category: "book";
   title: string;
   authors: string[];
-  publishDate: string;
+  publishDate: number;
   genres: string[];
   images: string | string[] | { thumbnail: string } | null;
   externalUrl: string;
@@ -80,9 +80,9 @@ export type Book = {
 };
 
 export type BookSearchResult = {
-  author: string;
+  author: string[];
   image: string;
-  publishDate: string;
+  publishDate: number;
   title: string;
   externalId: string;
   series: string | null;
@@ -147,14 +147,20 @@ export const isFilm = (value: unknown): value is Film => {
   );
 };
 
-export const isBookSearchResult = (value: unknown): value is BookSearchResult =>
-  isRecord(value) &&
-  typeof value.author === "string" &&
-  typeof value.image === "string" &&
-  typeof value.publishDate === "string" &&
-  typeof value.title === "string" &&
-  typeof value.externalId === "string" &&
-  (typeof value.series === "string" || value.series === null);
+export const isBookSearchResult = (
+  value: unknown,
+): value is BookSearchResult => {
+  if (!isRecord(value)) return false;
+
+  return (
+    Array.isArray(value.author) &&
+    value.author.every((author) => typeof author === "string") &&
+    typeof value.image === "string" &&
+    typeof value.publishDate === "number" &&
+    typeof value.title === "string" &&
+    typeof value.externalId === "string"
+  );
+};
 
 export const isGameSearchResult = (
   value: unknown,

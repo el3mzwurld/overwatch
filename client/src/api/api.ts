@@ -17,7 +17,6 @@ interface DiscoverFilmReturn {
 export interface GameSearch {
   message: string;
   results: GameSearchResult[];
-  // RAWG sends null on the last page
   nextPage: string | null;
 }
 
@@ -225,7 +224,7 @@ export async function searchGame(
     const res = await axiosInstance.get(`/items/games/find`, {
       params: { search: query.toLowerCase(), page: page ?? 1 },
     });
-    const data: GameSearch = res.data.results;
+    const data: GameSearch = res.data;
     return data.results;
   } catch (error) {
     console.error(

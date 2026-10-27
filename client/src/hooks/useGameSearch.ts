@@ -10,7 +10,7 @@ export function useGameSearch(query: string) {
     queryFn: () => {
       return searchGame(debouncedQuery);
     },
-    enabled: debouncedQuery.length > 1,
+    enabled: debouncedQuery.length > 2,
   });
 
   const games = q.data ?? [];
