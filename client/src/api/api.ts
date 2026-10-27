@@ -123,7 +123,9 @@ export async function searchBook(query: string): Promise<BookSearchResult[]> {
       params: { search: query },
     });
     const data: BookSearchResult[] = res.data.results;
-    return data;
+    const dataSet = new Set(data);
+    const refined = [...dataSet];
+    return refined;
   } catch (error) {
     console.error(
       `Error : ${(error as Error).message} \n Cause : ${(error as Error).cause}`,

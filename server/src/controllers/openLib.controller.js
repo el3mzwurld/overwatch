@@ -89,7 +89,7 @@ export const searchBook = async (req, res) => {
   try {
     const data = await fetchOpenLib(endpoint);
     const results = await data.docs.map((raw) => normalizeSearchedBook(raw));
-    return res.status(200).json({ query: query, results });
+    return res.status(200).json({ results });
   } catch (error) {
     console.error(error.message, error.cause);
     res.status(500).json({ error: error.message });

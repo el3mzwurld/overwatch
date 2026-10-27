@@ -22,6 +22,7 @@ const fetchTMDB = async (endpoint) => {
   return data;
 };
 
+// discover
 export async function getFilms(req, res) {
   const page = Math.max(1, Number(req.query.page) || 1);
   try {
@@ -47,7 +48,7 @@ export async function getFilms(req, res) {
     });
   }
 }
-
+// search
 export const searchFilms = async (req, res) => {
   const { q } = req.query;
 
@@ -75,7 +76,6 @@ export const searchFilms = async (req, res) => {
         : [];
 
     const searchResults = [...movies, ...shows];
-
     return res.json({ films: searchResults });
   } catch (error) {
     res.status(500).json({
@@ -83,11 +83,10 @@ export const searchFilms = async (req, res) => {
     });
   }
 };
-
+// get specific film
 export const getFilm = async (req, res) => {
   const id = req.params.id;
   const type = req.query.type;
-  console.log(type);
   if (!id || !type) {
     return res.status(400).json({
       error:

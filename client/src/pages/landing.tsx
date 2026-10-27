@@ -25,7 +25,7 @@ const Landing = () => {
   );
 };
 
-const Header = () => {
+export const Header = () => {
   const { mode, setMode } = useColorScheme();
   const theme = useTheme();
   return (
@@ -60,7 +60,7 @@ const Header = () => {
           width: { xs: 55 },
           height: { xs: 55 },
           borderRadius: "100px",
-          border: "1px",
+          border: "1.5px",
           borderColor: "secondary.main",
           borderStyle: "dashed",
         }}

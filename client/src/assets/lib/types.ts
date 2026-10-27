@@ -127,6 +127,60 @@ export type GameSearchResult = {
   };
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+export const isFilm = (value: unknown): value is Film => {
+  if (!isRecord(value) || !isRecord(value.metadata)) return false;
+
+  return (
+    typeof value.externalId === "string" &&
+    (value.category === "movie" || value.category === "tv") &&
+    typeof value.title === "string" &&
+    typeof value.releaseDate === "string" &&
+    typeof value.posterUrl === "string" &&
+    typeof value.overview === "string" &&
+    typeof value.externalUrl === "string" &&
+    typeof value.metadata.voteAverage === "number" &&
+    Array.isArray(value.metadata.genreIds) &&
+    value.metadata.genreIds.every((id) => typeof id === "number")
+  );
+};
+
+export const isBookSearchResult = (value: unknown): value is BookSearchResult =>
+  isRecord(value) &&
+  typeof value.author === "string" &&
+  typeof value.image === "string" &&
+  typeof value.publishDate === "string" &&
+  typeof value.title === "string" &&
+  typeof value.externalId === "string" &&
+  (typeof value.series === "string" || value.series === null);
+
+export const isGameSearchResult = (
+  value: unknown,
+): value is GameSearchResult => {
+  if (
+    !isRecord(value) ||
+    !isRecord(value.esrbRating) ||
+    !isRecord(value.analytics)
+  ) {
+    return false;
+  }
+
+  return (
+    typeof value.externalId === "number" &&
+    typeof value.slug === "string" &&
+    typeof value.name === "string" &&
+    typeof value.releaseDate === "string" &&
+    typeof value.image === "string" &&
+    typeof value.esrbRating.id === "number" &&
+    typeof value.esrbRating.name === "string" &&
+    typeof value.esrbRating.slug === "string" &&
+    typeof value.analytics.averageRating === "number" &&
+    typeof value.analytics.metacriticRating === "number"
+  );
+};
+
 type RAWGPlatfom = {
   id: number;
   name: string;

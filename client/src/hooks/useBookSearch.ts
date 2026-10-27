@@ -12,7 +12,7 @@ export function UseBookSearch(query: string) {
   useEffect(() => setPage(1), [debouncedQuery]);
 
   const q = useQuery({
-    queryKey: ["search", "games", debouncedQuery],
+    queryKey: ["search", "books", debouncedQuery],
     queryFn: () => searchBook(debouncedQuery),
     enabled: debouncedQuery.length > 1 && page >= 1,
   });

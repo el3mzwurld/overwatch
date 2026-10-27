@@ -4,6 +4,8 @@ import { useUser } from "../context/user";
 import Landing from "./landing";
 import { Library } from "./library";
 import { Search } from "./search";
+import { Auth } from "./auth";
+import { Profile } from "./profile";
 
 // check if a user is logged in..if not, return them to the authentication screen
 
@@ -24,16 +26,18 @@ const ProtectedRoute = () => {
 export const Approuter = () => {
   return (
     <Routes>
-      <Route path="auth" />
+      <Route path="auth" element={<Auth />} />
+      <Route path="auth/register" element={<Auth />} />
 
       <Route path="/" element={<Home />}>
         <Route index element={<Landing />} />
         <Route path="search" element={<Search />} />
+        <Route path="item/:category/:id" />
         {/* only authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route path="library" element={<Library />} />
           <Route path="library/:id" />
-          <Route path="profile" />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Route>
     </Routes>

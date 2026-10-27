@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { discoverBooks } from "../api/api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DISCOVERY_PAGE_LIMIT, paginator } from "../assets/lib/utils";
 import type { Book } from "../assets/lib/types";
 
-export const useDiscoverBooks = () => {
+export const useDiscoverBooks = (id?: Book["externalId"]) => {
   const [page, setPage] = useState(1);
   const [books, setBooks] = useState<Book[]>([]);
   const q = useQuery({
@@ -14,6 +14,16 @@ export const useDiscoverBooks = () => {
   });
 
   const results = q.data ?? [];
+  // Keep the selected book stable when the results array changes.
+  const findBook = useMemo((): Book | null => {
+    if (!id) return null;
+
+    const book = results.find((item) => item.externalId === id);
+
+    return book ?? null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
   const loadMore = () => {
     const nextPage = paginator(q.data ?? [], page + 1, DISCOVERY_PAGE_LIMIT);
 
@@ -26,6 +36,7 @@ export const useDiscoverBooks = () => {
   }, [page, q.data, q.isPending]);
   return {
     books,
+    findBook,
     isLoading: q.isLoading,
     isPending: q.isPending,
     error: q.error,

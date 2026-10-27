@@ -36,7 +36,7 @@ const itemSchema = new mongoose.Schema(
       type: String,
     },
     link: {
-      type: String,
+      type: String, //external link
     },
   },
   { timestamps: true },

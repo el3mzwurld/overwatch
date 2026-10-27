@@ -1,23 +1,24 @@
-import { Box, Grid } from "@mui/material";
+import { Box, CircularProgress, Grid } from "@mui/material";
 import { MotionBox } from "../motioncomps";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Book, Movie, Gamepad } from "@mui/icons-material";
 import { DiscoveryCard } from "./Card";
-import type { Book as BookType, Film, Game } from "../../assets/lib/types";
 import { useDiscoverBooks } from "../../hooks/useDiscoverBooks";
 import { useDiscoverFilms } from "../../hooks/useDiscoverFilms";
 import { useDiscoverGames } from "../../hooks/useDiscoverGames";
-import { page_limit } from "../../assets/lib/utils";
 
 export type Category = "films" | "books" | "games";
 export const InfiniteGrid = () => {
   // load more div
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [cat, setCat] = useState<Category>("films");
+  const [changeDelay, setChangeDelay] = useState(false);
   // discovery hooks
   const discoverBook = useDiscoverBooks();
   const discoverFilm = useDiscoverFilms();
   const discoverGames = useDiscoverGames();
+
+  // load more
   const lm = useCallback(() => {
     if (cat === "books") {
       discoverBook.loadMore();
@@ -51,7 +52,7 @@ export const InfiniteGrid = () => {
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [loadMoreRef]);
+  }, [loadMoreRef, lm]);
 
   const displayedData = useMemo(() => {
     if (cat === "books") {
@@ -77,6 +78,14 @@ export const InfiniteGrid = () => {
     discoverGames.isPending,
   ]);
 
+  const changeCategory = (category: Category) => {
+    setChangeDelay(true);
+
+    setTimeout(() => {
+      setCat(category);
+      setChangeDelay(false);
+    }, 800);
+  };
   const hasMore = cat === "books" && discoverBook.hasMore;
   return (
     <MotionBox
@@ -101,7 +110,7 @@ export const InfiniteGrid = () => {
       >
         <Box
           className={`ig-header-ico ${cat === "books" ? "active" : ""}`}
-          onClick={() => setCat("books")}
+          onClick={() => changeCategory("books")}
           sx={{
             ":after": {
               backgroundColor: "secondary.main",
@@ -113,7 +122,7 @@ export const InfiniteGrid = () => {
         </Box>
         <Box
           className={`ig-header-ico ${cat === "films" ? "active" : ""}`}
-          onClick={() => setCat("films")}
+          onClick={() => changeCategory("films")}
           sx={{
             ":after": {
               backgroundColor: "secondary.main",
@@ -125,7 +134,7 @@ export const InfiniteGrid = () => {
         </Box>
         <Box
           className={`ig-header-ico ${cat === "games" ? "active" : ""}`}
-          onClick={() => setCat("games")}
+          onClick={() => changeCategory("games")}
           sx={{
             ":after": {
               backgroundColor: "secondary.main",
@@ -140,21 +149,32 @@ export const InfiniteGrid = () => {
       <Grid
         container
         spacing={{ xs: 1.5 }}
-        sx={{ minHeight: { xs: "100vh" }, backgroundColor: "inherit", mt: 2 }}
+        sx={{
+          minHeight: { xs: "100vh" },
+          backgroundColor: "inherit",
+          mt: 2,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        {displayedData.map((data, index) => (
-          <Grid size={{ xs: 6, sm: 4, lg: 3 }} key={index}>
-            <DiscoveryCard category={data.category} cardData={data} />
-          </Grid>
-        ))}
-
-        {hasMore && (
-          <div
-            style={{ width: "100%", textAlign: "center", padding: 10 }}
-            ref={loadMoreRef}
-          >
-            Load More
-          </div>
+        {changeDelay ? (
+          <CircularProgress
+            size={"3rem"}
+            color="secondary"
+            aria-label="data loading..."
+          />
+        ) : isLoading ? (
+          <CircularProgress
+            size={"3rem"}
+            color="secondary"
+            aria-label="data loading..."
+          />
+        ) : (
+          displayedData.map((data, index) => (
+            <Grid size={{ xs: 6, sm: 4, lg: 3 }} key={index}>
+              <DiscoveryCard category={data.category} cardData={data} />
+            </Grid>
+          ))
         )}
       </Grid>
     </MotionBox>

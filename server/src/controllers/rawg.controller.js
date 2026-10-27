@@ -3,6 +3,7 @@ import { normalizeGame, normalizeSearchedGame } from "../utils/utils.js";
 
 const RAWG_KEY = process.env.RAWG_KEY;
 const base_url = "https://api.rawg.io/api";
+
 const fetchRawg = async (endpoint = "") => {
   if (endpoint.trim().length === 0) return;
   const url = `${base_url}${endpoint}`;
@@ -56,7 +57,7 @@ export const getGame = async (req, res) => {
   try {
     const data = await fetchRawg(endpoint);
     const norm = normalizeGame(data);
-    res.status(200).json({ message: "Success", results: norm });
+    res.status(200).json({ results: norm });
   } catch (error) {
     res.status(200).json({ error: error.message, cause: error.cause });
     console.log(error.message);
@@ -64,7 +65,13 @@ export const getGame = async (req, res) => {
 };
 
 export const discoverByGenre = async (req, res) => {
-  const genre = req.query.genre || "action";
+  const genre = req.query.genre;
+
+  if (!genre || !String(genre)) {
+    return res
+      .status(400)
+      .json({ error: "Bad request, genre parameter not included in request" });
+  }
 
   const endpoint = `/games?genres=${genre}&key=${RAWG_KEY}`;
   try {

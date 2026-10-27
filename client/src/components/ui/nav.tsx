@@ -3,7 +3,7 @@ import {
   LibraryBooksRounded,
   SearchRounded,
 } from "@mui/icons-material";
-import { Box, useColorScheme, useTheme } from "@mui/material";
+import { Avatar, Box, useColorScheme, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 export const Nav = () => {
@@ -16,7 +16,6 @@ export const Nav = () => {
       sx={{
         width: "100%",
         px: { xs: 5 },
-        position: { xs: "fixed" },
         [theme.breakpoints.down("md")]: {
           bottom: 0,
           left: 0,
@@ -28,6 +27,7 @@ export const Nav = () => {
           borderTopLeftRadius: 25,
           borderTopRightRadius: 25,
           boxShadow: `0px -10px 10px ${mode === "light" ? "#0000000f" : "#47337c44"}`,
+          position: "fixed",
         },
         minHeight: { xs: 80 },
         py: { xs: 1.5 },
@@ -75,6 +75,21 @@ export const Nav = () => {
         }}
       >
         <LibraryBooksRounded
+          sx={{
+            width: { xs: 25 },
+            height: { xs: 25 },
+            color: "secondary.main",
+          }}
+        />
+      </Box>
+      <Box
+        className="nav-ico"
+        title="My profile"
+        onClick={() => {
+          navigator("/profile");
+        }}
+      >
+        <Avatar
           sx={{
             width: { xs: 25 },
             height: { xs: 25 },
