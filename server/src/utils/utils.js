@@ -178,7 +178,7 @@ export const normalizeSearchedGame = (result) => {
     category: "game",
     slug: result.slug,
     name: result.name,
-    releaseDate: result.released,
+    releaseDate: result.released ?? "Not Available",
     image: result.background_image,
     esrbRating: result.esrb_rating,
     analytics: {
