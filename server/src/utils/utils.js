@@ -111,8 +111,9 @@ export const normalizeFullMovie = (movie) => {
   return normalized;
 };
 export const normalikeBook = (work) => {
+  const id = work.key.trim().split("/")[2];
   return {
-    externalId: work.key, //"/works/OL16813053W"
+    externalId: id, //"/works/OL16813053W"
     category: "book",
     title: work.title,
     authors: work.authors?.map((a) => a.name) || [],
