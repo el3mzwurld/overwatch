@@ -144,7 +144,7 @@ export const normalizeSearchedBook = (work) => {
     image: `https://covers.openlibrary.org/b/id/${work.cover_i}-M.jpg`,
     publishDate: work.first_publish_year,
     title: work.title,
-    externalId: work.key,
+    externalId: work.key.trim().split("/")[2],
     series: work.series_key ?? null,
   };
 
