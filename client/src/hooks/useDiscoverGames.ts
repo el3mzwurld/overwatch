@@ -1,37 +1,51 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { discoverGames } from "../api/api";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DISCOVERY_PAGE_LIMIT } from "../assets/lib/utils";
 import type { Game } from "../assets/lib/types";
+import { LastPage } from "@mui/icons-material";
 
-export const useDiscoverGames = (id?: Game["externalId"]) => {
+export const useDiscoverGames = () => {
   const [page, setPage] = useState(1);
 
-  const q = useQuery({
+  const q = useInfiniteQuery({
     queryKey: ["discover-games", page],
-    queryFn: () => discoverGames(page, DISCOVERY_PAGE_LIMIT),
-    enabled: page >= 1,
+    queryFn: ({ pageParam }) => discoverGames(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (last) => {
+      if (!last.results || last.results.length === 0) {
+        return undefined;
+      }
+
+      return last.nextPage;
+    },
   });
 
-  const results = q.data ?? [];
+  const results = useMemo(() => {
+    return q.data?.pages ?? [];
+  }, [q.data]);
 
-  // Keep the selected game stable when the results array changes.
-  const findGame = useMemo((): Game | null => {
-    if (!id) return null;
+  const flatGames = useMemo(() => {
+    return results ? results.flatMap((r) => r.results) : [];
+  }, [results]);
 
-    const game = results.find((g) => g.externalId === id);
+  const findGame = useCallback((id?: Game["externalId"]) => {
+    if (!id) return;
 
-    return game ?? null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    const game = flatGames.find((g) => g.externalId === id);
 
+    return game;
+  }, []); //no need to include flatgames, we don't need to watch for changes on that dependency
   return {
-    games: results,
+    games: flatGames,
     findGame,
-    isLoading: q.isLoading,
+    isLoading: q.isLoading || q.isFetchingNextPage,
     isPending: q.isPending,
     error: q.error,
-    loadMore: () => setPage((p) => p + 1),
+    loadMore: () => {
+      q.fetchNextPage();
+    },
+    hasMore: q.hasNextPage,
     page,
   };
 };

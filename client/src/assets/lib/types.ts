@@ -182,8 +182,7 @@ export const isGameSearchResult = (
     typeof value.esrbRating.id === "number" &&
     typeof value.esrbRating.name === "string" &&
     typeof value.esrbRating.slug === "string" &&
-    typeof value.analytics.averageRating === "number" &&
-    typeof value.analytics.metacriticRating === "number"
+    typeof value.analytics.averageRating === "number"
   );
 };
 

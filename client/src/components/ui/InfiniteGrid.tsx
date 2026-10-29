@@ -35,7 +35,7 @@ export const InfiniteGrid = () => {
 
       const rect = loadMoreRef.current.getBoundingClientRect();
 
-      const isVis = rect.bottom <= window.innerHeight && rect.bottom >= 0;
+      const isVis = rect.top <= window.innerHeight && rect.bottom >= 0;
 
       return isVis;
     };
@@ -86,7 +86,6 @@ export const InfiniteGrid = () => {
       setChangeDelay(false);
     }, 800);
   };
-  const hasMore = cat === "books" && discoverBook.hasMore;
   return (
     <MotionBox
       initial={{ opacity: 0 }}
@@ -153,16 +152,26 @@ export const InfiniteGrid = () => {
           minHeight: { xs: "100vh" },
           backgroundColor: "inherit",
           mt: 2,
-          alignItems: "center",
+          alignContent: "center",
           justifyContent: "center",
         }}
       >
         {changeDelay ? (
-          <CircularProgress
-            size={"3rem"}
-            color="secondary"
-            aria-label="data loading..."
-          />
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress
+              size={"3rem"}
+              color="secondary"
+              aria-label="data loading..."
+            />
+          </div>
         ) : isLoading ? (
           <CircularProgress
             size={"3rem"}
@@ -170,11 +179,49 @@ export const InfiniteGrid = () => {
             aria-label="data loading..."
           />
         ) : (
-          displayedData.map((data, index) => (
-            <Grid size={{ xs: 6, sm: 4, lg: 3 }} key={index}>
-              <DiscoveryCard category={data.category} cardData={data} />
-            </Grid>
-          ))
+          <>
+            {displayedData.map((data, index) => (
+              <Grid size={{ xs: 6, sm: 4, lg: 3 }} key={index}>
+                <DiscoveryCard category={data.category} cardData={data} />
+              </Grid>
+            ))}
+
+            {cat === "games" && (
+              <div ref={loadMoreRef}>
+                {discoverGames.isLoading ? (
+                  <CircularProgress
+                    size={"1.25em"}
+                    color="secondary"
+                    aria-label="data loading..."
+                  />
+                ) : discoverGames.hasMore ? (
+                  "Load More"
+                ) : null}
+              </div>
+            )}
+
+            {cat === "books" && (
+              <div
+                ref={loadMoreRef}
+                style={{
+                  width: "100%",
+                  padding: "1em 1em",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {discoverBook.isLoading ? (
+                  <CircularProgress
+                    size={"1.25em"}
+                    color="secondary"
+                    aria-label="data loading..."
+                  />
+                ) : discoverBook.hasMore ? (
+                  "Load More"
+                ) : null}
+              </div>
+            )}
+          </>
         )}
       </Grid>
     </MotionBox>

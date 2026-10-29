@@ -8,9 +8,9 @@ export function useGameSearch(query: string) {
   const q = useQuery({
     queryKey: ["search", "games", debouncedQuery],
     queryFn: () => {
-      return searchGame(debouncedQuery);
+      return searchGame(debouncedQuery) ?? [];
     },
-    enabled: debouncedQuery.length > 2,
+    enabled: debouncedQuery.length > 1,
   });
 
   const games = q.data ?? [];

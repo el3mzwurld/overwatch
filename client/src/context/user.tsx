@@ -48,7 +48,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [isInitializing, setIsInitializing] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(() => !!getToken());
   async function login(email: string, password: string): Promise<AuthResponse> {
     setIsSubmitting(true);
     const body = {
@@ -106,8 +106,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const getCurrentProfile = useCallback(async () => {
     const tok = getToken();
+    console.log(tok);
     if (!tok) {
-      logout();
+      setUser(null);
+      setIsInitializing(false);
       return;
     }
     setIsInitializing(true);
@@ -117,10 +119,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setUser(userData.user);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        if (error.status === 401) {
-          deleteToken();
+        if (error.response?.status === 401) {
+          // deleteToken();
+          console.log("not authorized from backend");
           setUser(null);
-        } else if (error.status === 500) {
+        } else {
           setError("Server Error : There seems to be an issue on our end");
           console.error(error.message, error.cause);
         }
@@ -141,6 +144,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     getCurrentProfile();
+
+    const syncLogout = (event: StorageEvent) => {
+      if (event.key === "token" && !event.newValue) {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener("storage", syncLogout);
+    return () => window.removeEventListener("storage", syncLogout);
   }, [getCurrentProfile]);
 
   return (

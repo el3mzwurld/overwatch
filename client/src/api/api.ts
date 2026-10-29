@@ -25,6 +25,9 @@ export interface GameSearch {
 const toBareId = (id: string) =>
   encodeURIComponent(id.split("/").filter(Boolean).pop() ?? id);
 
+const removeObjectsWithNullValues = <T extends object>(items: T[]): T[] =>
+  items.filter((item) => Object.values(item).every((value) => value !== null));
+
 // film endpoints
 export async function discoverFilms(): Promise<Film[]> {
   try {
@@ -152,18 +155,26 @@ export async function getBookById(id: string): Promise<Book> {
     );
   }
 }
+
+interface InfiniteGameResult {
+  results: Game[];
+  nextPage: number;
+}
 // game endpoints
 export async function discoverGames(
-  page?: number,
+  pageParam: number = 1,
   limit?: number,
-): Promise<Game[]> {
+): Promise<InfiniteGameResult> {
   try {
     // VERIFY(backend): discoverDefaultGames returns { results: Game[] }
     const res = await axiosInstance.get("/items/games", {
-      params: { page: page ?? 1, limit: limit ?? 12 },
+      params: { page: pageParam, limit: limit ?? 12 },
     });
     const data: Game[] = res.data.results;
-    return data;
+    return {
+      results: data,
+      nextPage: pageParam + 1,
+    };
   } catch (error) {
     console.error(
       `Error : ${(error as Error).message} \n Cause : ${(error as Error).cause}`,
@@ -225,7 +236,7 @@ export async function searchGame(
       params: { search: query.toLowerCase(), page: page ?? 1 },
     });
     const data: GameSearch = res.data;
-    return data.results;
+    return removeObjectsWithNullValues(data.results);
   } catch (error) {
     console.error(
       `Error : ${(error as Error).message} \n Cause : ${(error as Error).cause}`,
