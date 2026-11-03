@@ -29,6 +29,7 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
+    cursor: pointer;
     &::after {
       position: absolute;
       bottom: 0;

@@ -49,6 +49,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [isInitializing, setIsInitializing] = useState(() => !!getToken());
+
   async function login(email: string, password: string): Promise<AuthResponse> {
     setIsSubmitting(true);
     const body = {
@@ -58,9 +59,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await axiosInstance.post("/auth/login", body);
       const data: LoginResponse = await response.data;
-      setUser(data.user);
       setToken(data.token);
-
+      setUser(data.user);
       return {
         success: true,
       };
@@ -104,18 +104,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const getCurrentProfile = useCallback(async () => {
+  const getCurrentProfile = async () => {
     const tok = getToken();
-    console.log(tok);
     if (!tok) {
       setUser(null);
       setIsInitializing(false);
       return;
     }
+    console.log(typeof tok);
     setIsInitializing(true);
     try {
       const response = await axiosInstance.get("/auth/me");
       const userData = response.data;
+      console.log(userData);
       setUser(userData.user);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -134,7 +135,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsInitializing(false);
     }
-  }, []);
+  };
 
   function logout() {
     setUser(null);
@@ -153,7 +154,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener("storage", syncLogout);
     return () => window.removeEventListener("storage", syncLogout);
-  }, [getCurrentProfile]);
+  }, []);
 
   return (
     <UserContext.Provider

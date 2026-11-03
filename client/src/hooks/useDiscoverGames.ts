@@ -29,12 +29,12 @@ export const useDiscoverGames = () => {
     return results ? results.flatMap((r) => r.results) : [];
   }, [results]);
 
-  const findGame = useCallback((id?: Game["externalId"]) => {
-    if (!id) return;
+  const findGame = useCallback((id?: Game["externalId"]): Game | null => {
+    if (!id) return null;
 
     const game = flatGames.find((g) => g.externalId === id);
 
-    return game;
+    return game ?? null;
   }, []); //no need to include flatgames, we don't need to watch for changes on that dependency
   return {
     games: flatGames,

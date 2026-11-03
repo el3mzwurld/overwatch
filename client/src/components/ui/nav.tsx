@@ -29,8 +29,8 @@ export const Nav = () => {
           boxShadow: `0px -10px 10px ${mode === "light" ? "#0000000f" : "#47337c44"}`,
           position: "fixed",
         },
-        minHeight: { xs: 80 },
-        py: { xs: 1.5 },
+        minHeight: { xs: 80, md: "100%" },
+        py: { xs: 1.5, md: 0 },
         display: "flex",
         alignItems: "center",
         justifyContent: "space-evenly",
@@ -46,8 +46,8 @@ export const Nav = () => {
       >
         <HouseRounded
           sx={{
-            width: { xs: 25 },
-            height: { xs: 25 },
+            width: { xs: 25, md: 20 },
+            height: { xs: 25, md: 20 },
             color: "secondary.main",
           }}
         />
@@ -61,8 +61,8 @@ export const Nav = () => {
       >
         <SearchRounded
           sx={{
-            width: { xs: 25 },
-            height: { xs: 25 },
+            width: { xs: 25, md: 20 },
+            height: { xs: 25, md: 20 },
             color: "secondary.main",
           }}
         />
@@ -76,8 +76,8 @@ export const Nav = () => {
       >
         <LibraryBooksRounded
           sx={{
-            width: { xs: 25 },
-            height: { xs: 25 },
+            width: { xs: 25, md: 20 },
+            height: { xs: 25, md: 20 },
             color: "secondary.main",
           }}
         />
@@ -91,8 +91,8 @@ export const Nav = () => {
       >
         <Avatar
           sx={{
-            width: { xs: 25 },
-            height: { xs: 25 },
+            width: { xs: 25, md: 20 },
+            height: { xs: 25, md: 20 },
             color: "secondary.main",
           }}
         />

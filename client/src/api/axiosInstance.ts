@@ -11,6 +11,8 @@ axiosInstance.interceptors.request.use(
 
     if (token) {
       req.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.log("No token found");
     }
 
     return req;

@@ -5,7 +5,7 @@ export const Logo = () => {
   const { mode } = useColorScheme();
   return (
     <Box
-      sx={{ width: { xs: 50 }, height: { xs: 50 } }}
+      sx={{ width: { xs: 50, md: "2.5rem" }, height: { xs: 50, md: "2.5rem" } }}
       aria-description="overwatch logo"
     >
       <img

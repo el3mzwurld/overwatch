@@ -1,7 +1,4 @@
-import {
-  ArrowBackRounded,
-  OpenInNewRounded,
-} from "@mui/icons-material";
+import { ArrowBackRounded, OpenInNewRounded } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -13,6 +10,7 @@ import {
 } from "@mui/material";
 import type { Book, Film, Game } from "../../assets/lib/types";
 import placeholder from "/img/logo-alt.png";
+import { useParams } from "react-router-dom";
 
 type ContentData = Book | Film | Game;
 
@@ -81,12 +79,21 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
   const rating = getRating(content);
   const genres = getGenres(content);
   const externalUrl =
-    content.category === "book" || content.category === "movie" || content.category === "tv"
+    content.category === "book" ||
+    content.category === "movie" ||
+    content.category === "tv"
       ? content.externalUrl
       : undefined;
-
   return (
-    <Box component="main" sx={{ width: "100%", maxWidth: 1000, mx: "auto", p: { xs: 2, sm: 3, md: 4 } }}>
+    <Box
+      component="main"
+      sx={{
+        width: "100%",
+        maxWidth: 1000,
+        mx: "auto",
+        p: { xs: 2, sm: 3, md: 4 },
+      }}
+    >
       {onBack && (
         <Button
           onClick={onBack}
@@ -99,7 +106,11 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
 
       <Paper
         variant="outlined"
-        sx={{ overflow: "hidden", borderRadius: 0, bgcolor: "background.default" }}
+        sx={{
+          overflow: "hidden",
+          borderRadius: 0,
+          bgcolor: "background.default",
+        }}
       >
         <Stack direction={{ xs: "column", md: "row" }}>
           <Box
@@ -115,7 +126,10 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
             }}
           />
 
-          <Stack spacing={2.5} sx={{ flex: 1, minWidth: 0, p: { xs: 2.5, sm: 4 } }}>
+          <Stack
+            spacing={2.5}
+            sx={{ flex: 1, minWidth: 0, p: { xs: 2.5, sm: 4 } }}
+          >
             <Box>
               <Chip
                 size="small"
@@ -142,7 +156,12 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
             )}
 
             {genres.length > 0 && (
-              <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                useFlexGap
+                sx={{ flexWrap: "wrap" }}
+              >
                 {genres.map((genre) => (
                   <Chip key={genre} label={genre} size="small" />
                 ))}

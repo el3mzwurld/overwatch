@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { discoverBooks } from "../api/api";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DISCOVERY_PAGE_LIMIT, paginator } from "../assets/lib/utils";
 import type { Book } from "../assets/lib/types";
 
@@ -15,7 +15,7 @@ export const useDiscoverBooks = (id?: Book["externalId"]) => {
 
   const results = q.data ?? [];
   // Keep the selected book stable when the results array changes.
-  const findBook = useMemo((): Book | null => {
+  const findBook = useCallback((): Book | null => {
     if (!id) return null;
 
     const book = results.find((item) => item.externalId === id);

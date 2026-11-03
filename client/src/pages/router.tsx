@@ -6,11 +6,18 @@ import { Library } from "./library";
 import { Search } from "./search";
 import { Auth } from "./auth";
 import { Profile } from "./profile";
+import { Document } from "./document";
+import { useEffect } from "react";
+import { CircularProgress } from "@mui/material";
 
 // check if a user is logged in..if not, return them to the authentication screen
 
 const ProtectedRoute = () => {
   const userContext = useUser();
+  console.log(userContext);
+  if (userContext?.isInitializing) {
+    return <CircularProgress />;
+  }
 
   if (!userContext?.user) {
     return <Navigate to={"/auth"} />;
@@ -32,7 +39,7 @@ export const Approuter = () => {
       <Route path="/" element={<Home />}>
         <Route index element={<Landing />} />
         <Route path="search" element={<Search />} />
-        <Route path="item/:category/:id" />
+        <Route path="item/:category/:id" element={<Document />} />
         {/* only authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route path="library" element={<Library />} />

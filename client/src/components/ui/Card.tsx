@@ -1,7 +1,6 @@
-import { Divider, Typography, useTheme } from "@mui/material";
+import { Stack, Typography, useTheme } from "@mui/material";
 import {
   isBookSearchResult,
-  isFilm,
   isGameSearchResult,
   type Book,
   type BookSearchResult,
@@ -82,8 +81,8 @@ export const DiscoveryCard = (props: CardProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       sx={{
-        width: "100%",
-        height: { xs: "20rem" },
+        width: { xs: "100%", md: "80%" },
+        height: { xs: "20em", md: "25em" },
         backgroundColor: "background.paper",
         borderRadius: 2.25,
         overflow: "hidden",
@@ -97,6 +96,7 @@ export const DiscoveryCard = (props: CardProps) => {
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            objectPosition: "center",
           }}
         ></img>
       </MotionBox>
@@ -128,7 +128,7 @@ interface SearchCardProps {
   cardData?: Film | BookSearchResult | GameSearchResult;
   mode: "category" | "result";
   resultNumber?: number;
-  caegory?: string;
+  category?: Category;
   onClick?: (category: Category) => void;
 }
 
@@ -136,10 +136,9 @@ export const SearchCard = ({
   cardData,
   mode = "result",
   resultNumber,
-  caegory,
+  category,
   onClick,
 }: SearchCardProps) => {
-  console.log(cardData);
   const theme = useTheme();
   const title = () => {
     if (isGameSearchResult(cardData)) {
@@ -173,53 +172,73 @@ export const SearchCard = ({
   return (
     <MotionStack
       className="search-card"
-      direction={{ xs: "row" }}
+      direction="row"
       whileHover={{
-        backgroundColor: theme.palette.secondary.main,
-        scale: [null, 1.1, 1.2],
-
+        y: -3,
+        boxShadow: `0 8px 24px ${theme.palette.action.hover}`,
         transition: {
-          duration: 0.4,
+          duration: 0.2,
           type: "spring",
-          stiffness: 100,
-          ease: "easeIn",
+          stiffness: 300,
         },
       }}
-      initial={{
-        opacity: 0,
-        scale: 0.7,
-        y: 20,
-      }}
-      whileInView={{
-        opacity: 1,
-        scale: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 1,
-        type: mode === "category" ? "tween" : "spring",
-        ease: "easeIn",
-      }}
-      viewport={{ once: true, amount: 0.4 }}
       sx={{
         width: { xs: "100%" },
-        height: { xs: mode === "category" ? "5rem" : "6.5rem" },
+        minHeight:
+          mode === "category"
+            ? { xs: 84, sm: 96 }
+            : { xs: 112, sm: 128 },
         position: "relative",
         overflow: "hidden",
         alignItems: "center",
-        justifyContent: "space-between",
-        gap: { xs: 0.8 },
-        border: "1px solid gray",
+        justifyContent: mode === "category" ? "space-between" : "flex-start",
+        gap: { xs: 1.5 },
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 2.5,
+        bgcolor: "background.paper",
+        color: "text.primary",
+        cursor: mode === "category" ? "pointer" : "default",
+        transition: "border-color 160ms ease",
+        "&:hover": {
+          borderColor: mode === "category" ? "text.secondary" : "divider",
+        },
+        "&:focus-visible": {
+          outline: "2px solid",
+          outlineColor: "secondary.main",
+          outlineOffset: 2,
+        },
       }}
-      onClick={() => onClick && onClick(caegory as Category)}
+      role={mode === "category" ? "button" : undefined}
+      tabIndex={mode === "category" ? 0 : undefined}
+      onClick={() => category && onClick?.(category)}
+      onKeyDown={(event) => {
+        if (mode === "category" && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          if (category) onClick?.(category);
+        }
+      }}
     >
       {mode === "result" && cardData && (
         <>
           {/* image */}
-          <MotionBox sx={{ width: { xs: "40%" }, height: { xs: "100%" } }}>
+          <MotionBox
+            sx={{
+              width: { xs: "36%", sm: "38%" },
+              height: "100%",
+              alignSelf: "stretch",
+              flexShrink: 0,
+            }}
+          >
             <img
               src={getImg() ?? placeholder}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              alt=""
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
             ></img>
           </MotionBox>
 
@@ -227,39 +246,56 @@ export const SearchCard = ({
           <MotionStack
             sx={{
               flex: 1,
-              height: { xs: "100%" },
-              alignItems: { xs: "end" },
+              minWidth: 0,
+              minHeight: "100%",
+              alignItems: "flex-start",
               justifyContent: "space-between",
-              px: { xs: 1.5 },
-              py: { xs: 1.5 },
-              maxWidth: { xs: "55%" },
+              px: { xs: 1.25, sm: 1.75 },
+              py: { xs: 1.25, sm: 1.5 },
             }}
           >
             <Typography
-              variant="caption"
+              variant="body2"
               sx={{
-                textWrap: "nowrap",
+                fontWeight: 600,
+                overflowWrap: "anywhere",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 width: "100%",
-                textAlign: "right",
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
               }}
             >
               {title()}
             </Typography>
-            <Typography variant="caption">
+            <Typography variant="caption" color="text.secondary">
               <em>{date}</em>
             </Typography>
           </MotionStack>
         </>
       )}
       {mode === "category" && (
-        <>
-          <Typography variant="body2" sx={{ px: { xs: 2 } }}>
-            {resultNumber ?? 0} Results found in {caegory}
+        <Stack
+          direction="row"
+          sx={{
+            width: "100%",
+            px: { xs: 2, sm: 2.5 },
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 600, textTransform: "capitalize" }}
+          >
+            {category}
           </Typography>
-          <Divider sx={{ mt: "auto" }} />
-        </>
+          <Typography variant="body2" color="text.secondary">
+            {resultNumber ?? 0} {resultNumber === 1 ? "result" : "results"}
+          </Typography>
+        </Stack>
       )}
     </MotionStack>
   );

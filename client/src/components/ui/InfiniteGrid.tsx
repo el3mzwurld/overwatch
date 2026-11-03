@@ -6,6 +6,7 @@ import { DiscoveryCard } from "./Card";
 import { useDiscoverBooks } from "../../hooks/useDiscoverBooks";
 import { useDiscoverFilms } from "../../hooks/useDiscoverFilms";
 import { useDiscoverGames } from "../../hooks/useDiscoverGames";
+import { useNavigate } from "react-router-dom";
 
 export type Category = "films" | "books" | "games";
 export const InfiniteGrid = () => {
@@ -13,6 +14,8 @@ export const InfiniteGrid = () => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [cat, setCat] = useState<Category>("films");
   const [changeDelay, setChangeDelay] = useState(false);
+  const nav = useNavigate();
+
   // discovery hooks
   const discoverBook = useDiscoverBooks();
   const discoverFilm = useDiscoverFilms();
@@ -29,6 +32,8 @@ export const InfiniteGrid = () => {
     }
     discoverGames.loadMore();
   }, [cat, discoverBook, discoverFilm, discoverGames]);
+
+  //pagination
   useEffect(() => {
     const checkPos = (): boolean => {
       if (!loadMoreRef.current) return false;
@@ -53,16 +58,17 @@ export const InfiniteGrid = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [loadMoreRef, lm]);
-
+  //data to display
   const displayedData = useMemo(() => {
     if (cat === "books") {
-      return discoverBook.books;
+      return discoverBook.books ?? [];
     }
     if (cat === "films") {
-      return discoverFilm.films;
+      return discoverFilm.films ?? [];
     }
-    return discoverGames.games;
+    return discoverGames.games ?? [];
   }, [cat, discoverBook.books, discoverFilm.films, discoverGames.games]);
+  //loading/pending state
   const isLoading = useMemo(() => {
     if (cat === "books") {
       return discoverBook.isPending;
@@ -77,15 +83,25 @@ export const InfiniteGrid = () => {
     discoverFilm.isPending,
     discoverGames.isPending,
   ]);
-
-  const changeCategory = (category: Category) => {
+  //category toggling
+  const changeCategory = (category: Category | "default") => {
     setChangeDelay(true);
+
+    if (category === "default") {
+      setTimeout(() => {
+        setCat("films");
+        setChangeDelay(false);
+      }, 800);
+
+      return;
+    }
 
     setTimeout(() => {
       setCat(category);
       setChangeDelay(false);
     }, 800);
   };
+
   return (
     <MotionBox
       initial={{ opacity: 0 }}
@@ -98,13 +114,14 @@ export const InfiniteGrid = () => {
       <MotionBox
         className="ig-header"
         sx={{
-          height: 65,
+          height: { xs: "4em", md: "3.5em" },
           width: "100%",
           overflow: "hidden",
           py: 0.8,
           display: "flex",
           gap: 2.5,
-          justifyContent: "space-evenly",
+          justifyContent: { xs: "space-evenly", md: "center" },
+          px: { md: "15rem" },
         }}
       >
         <Box
@@ -147,13 +164,15 @@ export const InfiniteGrid = () => {
       {/* grid */}
       <Grid
         container
-        spacing={{ xs: 1.5 }}
+        spacing={{ xs: 1.5, md: 3 }}
         sx={{
           minHeight: { xs: "100vh" },
           backgroundColor: "inherit",
           mt: 2,
           alignContent: "center",
-          justifyContent: "center",
+          justifyContent: { xs: "center", md: "start" },
+          overflow: "hidden",
+          px: { md: "10em" },
         }}
       >
         {changeDelay ? (
@@ -173,57 +192,122 @@ export const InfiniteGrid = () => {
             />
           </div>
         ) : isLoading ? (
-          <CircularProgress
-            size={"3rem"}
-            color="secondary"
-            aria-label="data loading..."
-          />
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress
+              size={"3rem"}
+              color="secondary"
+              aria-label="data loading..."
+            />
+          </div>
         ) : (
           <>
-            {displayedData.map((data, index) => (
-              <Grid size={{ xs: 6, sm: 4, lg: 3 }} key={index}>
-                <DiscoveryCard category={data.category} cardData={data} />
-              </Grid>
-            ))}
-
-            {cat === "games" && (
-              <div ref={loadMoreRef}>
-                {discoverGames.isLoading ? (
-                  <CircularProgress
-                    size={"1.25em"}
-                    color="secondary"
-                    aria-label="data loading..."
-                  />
-                ) : discoverGames.hasMore ? (
-                  "Load More"
-                ) : null}
-              </div>
+            {displayedData.map((data, index) =>
+              !data ? (
+                <div>
+                  {
+                    <ErrorBoundary
+                      category={cat}
+                      error={
+                        cat === "books"
+                          ? discoverBook.error!
+                          : cat === "films"
+                            ? discoverFilm.error!
+                            : discoverGames.error!
+                      }
+                    />
+                  }
+                </div>
+              ) : (
+                <Grid
+                  size={{ xs: 6, sm: 4, lg: 3 }}
+                  key={index}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                  onClick={() => {
+                    const category: Category =
+                      data.category === "movie" || data.category == "tv"
+                        ? "films"
+                        : data.category === "book"
+                          ? "books"
+                          : "games";
+                    const url = `/item/${category}/${data.externalId}`;
+                    nav(url);
+                  }}
+                >
+                  <DiscoveryCard category={data.category} cardData={data} />
+                </Grid>
+              ),
             )}
 
-            {cat === "books" && (
-              <div
-                ref={loadMoreRef}
-                style={{
-                  width: "100%",
-                  padding: "1em 1em",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                {discoverBook.isLoading ? (
-                  <CircularProgress
-                    size={"1.25em"}
-                    color="secondary"
-                    aria-label="data loading..."
-                  />
-                ) : discoverBook.hasMore ? (
-                  "Load More"
-                ) : null}
-              </div>
-            )}
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "1em 1em",
+              }}
+            >
+              {cat === "games" && (
+                <Box ref={loadMoreRef} sx={{ color: "text" }}>
+                  {discoverGames.isLoading ? (
+                    <CircularProgress
+                      size={"1.25em"}
+                      color="secondary"
+                      aria-label="data loading..."
+                    />
+                  ) : discoverGames.hasMore ? (
+                    `Load More...`
+                  ) : null}
+                </Box>
+              )}
+
+              {cat === "books" && (
+                <div
+                  ref={loadMoreRef}
+                  style={{
+                    width: "100%",
+                    padding: "1em 1em",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  {discoverBook.isLoading ? (
+                    <CircularProgress
+                      size={"1.25em"}
+                      color="secondary"
+                      aria-label="data loading..."
+                    />
+                  ) : discoverBook.hasMore ? (
+                    "Load More"
+                  ) : null}
+                </div>
+              )}
+            </div>
           </>
         )}
       </Grid>
     </MotionBox>
+  );
+};
+
+interface ErrorBoundaryState {
+  category: Category;
+  error: Error;
+}
+const ErrorBoundary = (props: ErrorBoundaryState) => {
+  return (
+    <p>
+      {props.error
+        ? props.error.message
+        : `We hit a snag trying to get the ${props.category} data.`}
+    </p>
   );
 };

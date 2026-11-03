@@ -236,6 +236,7 @@ export async function searchGame(
       params: { search: query.toLowerCase(), page: page ?? 1 },
     });
     const data: GameSearch = res.data;
+    console.log(data);
     return removeObjectsWithNullValues(data.results);
   } catch (error) {
     console.error(

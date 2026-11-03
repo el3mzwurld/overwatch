@@ -2,7 +2,7 @@
 const tok_store = import.meta.env.VITE_LOCAL_TOKEN_STORAGE;
 
 export const setToken = (token: string) => {
-  localStorage.setItem(tok_store, JSON.stringify(token));
+  localStorage.setItem(tok_store, token);
 };
 
 export const getToken = (): string | null => {

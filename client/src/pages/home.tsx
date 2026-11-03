@@ -10,7 +10,9 @@ export const Home = () => {
         <Outlet />
       </Container>
 
-      <Nav />
+      <Box sx={{ display: { md: "none" } }}>
+        <Nav />
+      </Box>
     </Box>
   );
 };
