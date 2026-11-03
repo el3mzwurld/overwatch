@@ -23,6 +23,12 @@ export const reqAuth = (req, res, next) => {
         .status(401)
         .json({ error: "Session expired. Please log in again." });
     }
-    return res.status(401).json({ error: "Invalid token." });
+    return res
+      .status(401)
+      .json({
+        error: "Invalid token.",
+        cause: error.cause,
+        message: error.message,
+      });
   }
 };
