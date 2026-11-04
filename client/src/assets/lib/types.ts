@@ -34,6 +34,7 @@ export type FullMovie = {
   overview: string;
   runtime: string;
   releaseStatus: string;
+  externalUrl: string;
   metaData: {
     voteAverage: number;
     genres: { id: number; name: string }[];
@@ -51,6 +52,7 @@ export type FullTvShow = {
   runtime: string;
   releaseStatus: string;
   seasonCount: number;
+  externalUrl: string;
   networks: {
     id: number;
     logo_path: string;

@@ -1,18 +1,38 @@
-import { ArrowBackRounded, OpenInNewRounded } from "@mui/icons-material";
+import {
+  AddRounded,
+  ArrowBackRounded,
+  OpenInNewRounded,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
   Chip,
   Divider,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   Typography,
 } from "@mui/material";
-import type { Book, Film, Game } from "../../assets/lib/types";
+import { useState } from "react";
+import type {
+  Book,
+  Film,
+  FullMovie,
+  FullTvShow,
+  Game,
+} from "../../assets/lib/types";
 import placeholder from "/img/logo-alt.png";
-import { useParams } from "react-router-dom";
+import { MovieGenreMapper, TVGenreMapper } from "../../assets/lib/utils";
 
-type ContentData = Book | Film | Game;
+type ContentData = Book | FullMovie | FullTvShow | Game;
+type LibraryStatus = "want" | "in progress" | "finished";
 
 type ContentPageProps = {
   content: ContentData;
@@ -70,28 +90,32 @@ const getGenres = (content: ContentData) => {
   if (content.category === "book") {
     return content.genres;
   }
-  return content.metadata.genreIds.map((id) => `Genre ${id}`);
+  if (content.category === "movie" || content.category === "tv") {
+    return content.metaData.genres.map((genre) => genre.name);
+  }
 };
 
 export const ContentPage = ({ content, onBack }: ContentPageProps) => {
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [status, setStatus] = useState<LibraryStatus>("want");
   const title = getTitle(content);
   const description = getDescription(content);
   const rating = getRating(content);
   const genres = getGenres(content);
   const externalUrl =
-    content.category === "book" ||
-    content.category === "movie" ||
-    content.category === "tv"
+    content.category === "book"
       ? content.externalUrl
-      : undefined;
+      : content.category === "game"
+        ? undefined
+        : content.externalUrl;
   return (
     <Box
       component="main"
       sx={{
         width: "100%",
-        maxWidth: 1000,
+        maxWidth: 1120,
         mx: "auto",
-        p: { xs: 2, sm: 3, md: 4 },
+        p: { xs: 1.5, sm: 3, md: 4 },
       }}
     >
       {onBack && (
@@ -108,8 +132,8 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
         variant="outlined"
         sx={{
           overflow: "hidden",
-          borderRadius: 0,
-          bgcolor: "background.default",
+          borderRadius: { xs: 2, sm: 3 },
+          bgcolor: "background.paper",
         }}
       >
         <Stack direction={{ xs: "column", md: "row" }}>
@@ -120,15 +144,15 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
             sx={{
               display: "block",
               width: { xs: "100%", md: 320 },
-              height: { xs: 280, sm: 360, md: 440 },
+              height: { xs: 240, sm: 340, md: 460 },
               objectFit: "cover",
               bgcolor: "action.hover",
             }}
           />
 
           <Stack
-            spacing={2.5}
-            sx={{ flex: 1, minWidth: 0, p: { xs: 2.5, sm: 4 } }}
+            spacing={{ xs: 2, sm: 2.5 }}
+            sx={{ flex: 1, minWidth: 0, p: { xs: 2, sm: 3, md: 4 } }}
           >
             <Box>
               <Chip
@@ -140,7 +164,11 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
               <Typography
                 component="h1"
                 variant="h4"
-                sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
+                sx={{
+                  fontSize: { xs: "1.75rem", sm: "2.125rem" },
+                  fontWeight: 600,
+                  overflowWrap: "anywhere",
+                }}
               >
                 {title}
               </Typography>
@@ -155,7 +183,7 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
               </Typography>
             )}
 
-            {genres.length > 0 && (
+            {genres && genres.length > 0 && (
               <Stack
                 direction="row"
                 spacing={1}
@@ -182,21 +210,88 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
               </Typography>
             </Box>
 
-            {externalUrl && (
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.25}
+              useFlexGap
+              sx={{ mt: "auto", pt: 1, flexWrap: "wrap" }}
+            >
               <Button
-                href={externalUrl}
-                target="_blank"
-                rel="noreferrer"
-                variant="outlined"
-                endIcon={<OpenInNewRounded />}
-                sx={{ alignSelf: "flex-start", borderRadius: 0, mt: "auto" }}
+                onClick={() => setIsAddDialogOpen(true)}
+                variant="contained"
+                startIcon={<AddRounded />}
+                sx={{
+                  alignSelf: { sm: "flex-start" },
+                  borderRadius: 2,
+                  textTransform: "none",
+                }}
               >
-                More information
+                Add to library
               </Button>
-            )}
+              {externalUrl && (
+                <Button
+                  href={externalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  variant="outlined"
+                  endIcon={<OpenInNewRounded />}
+                  sx={{
+                    alignSelf: { sm: "flex-start" },
+                    borderRadius: 2,
+                    textTransform: "none",
+                  }}
+                >
+                  More information
+                </Button>
+              )}
+            </Stack>
           </Stack>
         </Stack>
       </Paper>
+
+      <Dialog
+        open={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        fullWidth
+        maxWidth="xs"
+        aria-labelledby="add-to-library-title"
+      >
+        <DialogTitle id="add-to-library-title">Add to your library</DialogTitle>
+        <DialogContent>
+          <Typography color="text.secondary" sx={{ mb: 2 }}>
+            Let's know where you're on with {title}.
+          </Typography>
+          <FormControl fullWidth>
+            <InputLabel id="library-status-label">Status</InputLabel>
+            <Select<LibraryStatus>
+              labelId="library-status-label"
+              id="library-status"
+              value={status}
+              label="Status"
+              onChange={(event) => setStatus(event.target.value)}
+            >
+              <MenuItem value="want">Want</MenuItem>
+              <MenuItem value="in progress">In progress</MenuItem>
+              <MenuItem value="finished">Finished</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button
+            onClick={() => setIsAddDialogOpen(false)}
+            sx={{ textTransform: "none" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => setIsAddDialogOpen(false)}
+            sx={{ textTransform: "none" }}
+          >
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

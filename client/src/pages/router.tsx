@@ -7,7 +7,6 @@ import { Search } from "./search";
 import { Auth } from "./auth";
 import { Profile } from "./profile";
 import { Document } from "./document";
-import { useEffect } from "react";
 import { CircularProgress } from "@mui/material";
 
 // check if a user is logged in..if not, return them to the authentication screen

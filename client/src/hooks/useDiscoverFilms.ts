@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { discoverFilms } from "../api/api";
+import { discoverFilms, getMovie, getShow } from "../api/api";
 import { useCallback, useMemo, useState } from "react";
 import { DISCOVERY_PAGE_LIMIT, paginator } from "../assets/lib/utils";
-import type { Film } from "../assets/lib/types";
+import type { Film, FullMovie, FullTvShow } from "../assets/lib/types";
 
 export const useDiscoverFilms = () => {
   const [page, setPage] = useState(1);
@@ -15,14 +15,22 @@ export const useDiscoverFilms = () => {
 
   const films = q.data ?? [];
   // Keep the selected film stable when the results array changes.
-  const findFilm = useCallback((id?: Film["externalId"]): Film | null => {
-    if (!id) return null;
-
-    const film = films.find((item) => item.externalId === id);
-
-    return film ?? null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const findFilm = useCallback(
+    async (id?: Film["externalId"]): Promise<FullMovie | FullTvShow | null> => {
+      if (!id) return null;
+      const type = id.includes("movie") ? "movie" : "tv";
+      try {
+        const res =
+          type === "movie"
+            ? await getMovie(Number(id.split("-")[1]))
+            : await getShow(Number(id.split("-")[1]));
+        return res;
+      } catch (error) {
+        return null;
+      }
+    },
+    [],
+  );
 
   return {
     films: paginator(films, page, DISCOVERY_PAGE_LIMIT),

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { discoverBooks } from "../api/api";
+import { discoverBooks, getBookById } from "../api/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DISCOVERY_PAGE_LIMIT, paginator } from "../assets/lib/utils";
 import type { Book } from "../assets/lib/types";
@@ -14,14 +14,31 @@ export const useDiscoverBooks = (id?: Book["externalId"]) => {
   });
 
   const results = q.data ?? [];
-  // Keep the selected book stable when the results array changes.
-  const findBook = useCallback((): Book | null => {
+
+  const bookFallBack = useCallback((): Book | null => {
     if (!id) return null;
 
     const book = results.find((item) => item.externalId === id);
 
     return book ?? null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+  const findBook = useCallback(async () => {
+    if (!id) return null;
+    try {
+      const res = await getBookById(id);
+      return res;
+    } catch (error) {
+      console.error(
+        "Error fetching book by ID from open Library:",
+        error,
+        "using the fallback now...",
+      );
+      const fallback = bookFallBack();
+      if (!fallback) throw error;
+      return fallback;
+      // eslint-disable-next-line
+    }
   }, [id]);
 
   const loadMore = () => {

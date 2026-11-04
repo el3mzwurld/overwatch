@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import type { Book, Film, Game } from "../assets/lib/types";
+import type {
+  Book,
+  Film,
+  FullMovie,
+  FullTvShow,
+  Game,
+} from "../assets/lib/types";
 import type { Category } from "../components/ui/InfiniteGrid";
 import { useDiscoverFilms } from "../hooks/useDiscoverFilms";
 import { useDiscoverBooks } from "../hooks/useDiscoverBooks";
@@ -9,24 +15,31 @@ import { Box, CircularProgress } from "@mui/material";
 import { ContentPage } from "../components/ui/contentPage";
 
 export const Document = () => {
-  const [doc, setDoc] = useState<Film | Game | Book | null>(null);
+  const [doc, setDoc] = useState<FullMovie | FullTvShow | Game | Book | null>(
+    null,
+  );
   const { category, id } = useParams();
   const { findFilm } = useDiscoverFilms();
   const { findBook } = useDiscoverBooks(id);
   const { findGame } = useDiscoverGames();
   useEffect(() => {
     if (!category || !id) return;
-    if ((category as Category) === "films") {
-      setDoc(findFilm(id));
-      return;
+    async function fetchDoc() {
+      if ((category as Category) === "films") {
+        const film = await findFilm(id);
+        setDoc(film);
+        return;
+      }
+      if ((category as Category) === "games") {
+        const iden = Number(id);
+        setDoc(findGame(iden));
+        return;
+      }
+      const book = await findBook();
+      setDoc(book);
     }
-    if ((category as Category) === "games") {
-      const iden = Number(id);
-      setDoc(findGame(iden));
-      return;
-    }
-    const book = findBook;
-    setDoc(book);
+
+    void fetchDoc();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, category]);
 
