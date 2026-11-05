@@ -21,15 +21,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import type {
-  Book,
-  Film,
-  FullMovie,
-  FullTvShow,
-  Game,
-} from "../../assets/lib/types";
+import type { Book, FullMovie, FullTvShow, Game } from "../../assets/lib/types";
 import placeholder from "/img/logo-alt.png";
 import { MovieGenreMapper, TVGenreMapper } from "../../assets/lib/utils";
+import useLibrary from "../../hooks/useLibrary";
+import { useUser } from "../../context/user";
 
 type ContentData = Book | FullMovie | FullTvShow | Game;
 type LibraryStatus = "want" | "in progress" | "finished";
@@ -48,12 +44,12 @@ const getImage = (content: ContentData) => {
   }
   if (content.category === "book") {
     if (Array.isArray(content.images)) {
-      return content.images[0] || placeholder;
+      return content.images[0] ?? placeholder;
     }
     if (typeof content.images === "string") {
-      return content.images || placeholder;
+      return content.images ?? placeholder;
     }
-    return content.images?.thumbnail || placeholder;
+    return content.images?.thumbnail ?? placeholder;
   }
   return content.posterUrl || placeholder;
 };
@@ -90,9 +86,13 @@ const getGenres = (content: ContentData) => {
   if (content.category === "book") {
     return content.genres;
   }
-  if (content.category === "movie" || content.category === "tv") {
-    return content.metaData.genres.map((genre) => genre.name);
-  }
+  return content.metaData?.genres.map((gen) => gen.name);
+};
+
+const getId = (content: ContentData) => {
+  if (content.category === "game") return content.slug;
+
+  return content.externalId;
 };
 
 export const ContentPage = ({ content, onBack }: ContentPageProps) => {
@@ -101,13 +101,15 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
   const title = getTitle(content);
   const description = getDescription(content);
   const rating = getRating(content);
-  const genres = getGenres(content);
+  const genres = getGenres(content) ?? [];
   const externalUrl =
     content.category === "book"
       ? content.externalUrl
       : content.category === "game"
         ? undefined
         : content.externalUrl;
+  console.log(title);
+  const { isInLibrary, addToLibrary } = useLibrary();
   return (
     <Box
       component="main"
@@ -216,18 +218,34 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
               useFlexGap
               sx={{ mt: "auto", pt: 1, flexWrap: "wrap" }}
             >
-              <Button
-                onClick={() => setIsAddDialogOpen(true)}
-                variant="contained"
-                startIcon={<AddRounded />}
-                sx={{
-                  alignSelf: { sm: "flex-start" },
-                  borderRadius: 2,
-                  textTransform: "none",
-                }}
-              >
-                Add to library
-              </Button>
+              {isInLibrary(title, getId(content)) ? (
+                <Button
+                  variant="contained"
+                  startIcon={<AddRounded />}
+                  sx={{
+                    alignSelf: { sm: "flex-start" },
+                    borderRadius: 2,
+                    textTransform: "none",
+                    py: 1.5,
+                  }}
+                >
+                  View In Library
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setIsAddDialogOpen(true)}
+                  variant="contained"
+                  startIcon={<AddRounded />}
+                  sx={{
+                    alignSelf: { sm: "flex-start" },
+                    borderRadius: 2,
+                    textTransform: "none",
+                    py: 1.5,
+                  }}
+                >
+                  Add to library
+                </Button>
+              )}
               {externalUrl && (
                 <Button
                   href={externalUrl}
@@ -239,6 +257,9 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
                     alignSelf: { sm: "flex-start" },
                     borderRadius: 2,
                     textTransform: "none",
+                    color: "text.primary",
+                    borderColor: "divider",
+                    py: 1.5,
                   }}
                 >
                   More information
@@ -285,7 +306,10 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
           </Button>
           <Button
             variant="contained"
-            onClick={() => setIsAddDialogOpen(false)}
+            onClick={() => {
+              addToLibrary(content, status);
+              setIsAddDialogOpen(false);
+            }}
             sx={{ textTransform: "none" }}
           >
             Add

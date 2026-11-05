@@ -230,13 +230,14 @@ export type Item = {
   userId: string;
   category: "movie" | "book" | "game" | "tv";
   title: string;
-  status: "want" | "in progress" | "finished" | "dropped";
+  status: ItemStatus;
   rating: number;
   notes: string;
   externalId: string;
   link: string;
 };
 
+export type ItemStatus = "want" | "in progress" | "finished" | "dropped";
 export type Playlist = {
   items: Item[];
 };

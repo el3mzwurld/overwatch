@@ -71,7 +71,7 @@ export const getBook = async (req, res) => {
     normalized.metadata.averageRating = ratings?.summary?.average;
     normalized.metadata.ratingsCount = ratings?.summary?.count;
     normalized.authors = authors.name;
-    return res.status(200).json({ results: normalized });
+    return res.status(200).json({ results: normalized, data });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

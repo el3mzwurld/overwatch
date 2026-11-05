@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import type {
   Book,
   Film,
@@ -11,8 +11,11 @@ import type { Category } from "../components/ui/InfiniteGrid";
 import { useDiscoverFilms } from "../hooks/useDiscoverFilms";
 import { useDiscoverBooks } from "../hooks/useDiscoverBooks";
 import { useDiscoverGames } from "../hooks/useDiscoverGames";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import { ContentPage } from "../components/ui/contentPage";
+import { Header } from "./landing";
+import { MotionBox } from "../components/motioncomps";
+import { ArrowBack } from "@mui/icons-material";
 
 export const Document = () => {
   const [doc, setDoc] = useState<FullMovie | FullTvShow | Game | Book | null>(
@@ -22,6 +25,12 @@ export const Document = () => {
   const { findFilm } = useDiscoverFilms();
   const { findBook } = useDiscoverBooks(id);
   const { findGame } = useDiscoverGames();
+  const nav = useNavigate();
+
+  const goBack = () => {
+    nav(-1);
+  };
+
   useEffect(() => {
     if (!category || !id) return;
     async function fetchDoc() {
@@ -53,9 +62,23 @@ export const Document = () => {
     return;
   }
 
-  return <ContentPage content={doc}></ContentPage>;
+  return (
+    <Box>
+      <Header />
+      {/* navigation pane */}
+      <MotionBox
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        sx={{ minHeight: 40, padding: { xs: 1.2 } }}
+      >
+        <Button variant="text" onClick={goBack} sx={{ color: "text.primary" }}>
+          <ArrowBack sx={{ mr: 1 }} fontSize="small" /> Go back
+        </Button>
+      </MotionBox>
+      <ContentPage content={doc}></ContentPage>
+    </Box>
+  );
 };
-
 const NotAccessible = () => {
   return (
     <Box style={{ fontSize: "0.7rem", color: "secondary.main" }}>

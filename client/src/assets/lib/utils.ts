@@ -1,3 +1,13 @@
+import type {
+  Book,
+  Film,
+  FullMovie,
+  FullTvShow,
+  Game,
+  Item,
+  ItemStatus,
+} from "./types";
+
 // this is for utility functions
 const tok_store = import.meta.env.VITE_LOCAL_TOKEN_STORAGE;
 
@@ -69,3 +79,57 @@ export const TVGenreMapper: Record<number, string> = {
   10768: "War & Politics",
   37: "Western",
 };
+
+const filmtoItemNormalizer = (
+  raw: Film | FullMovie | FullTvShow,
+  status: ItemStatus,
+): Item => {
+  return {
+    category: raw.category,
+    externalId: raw.externalId,
+    link: raw.externalUrl,
+    notes: "",
+    rating: 0,
+    status,
+    title: raw.title,
+    userId: "", //this will be set inside the hook itself
+  };
+};
+
+const bookToItemNormalizer = (raw: Book, status: ItemStatus): Item => {
+  return {
+    category: raw.category,
+    externalId: raw.externalId,
+    link: raw.externalUrl,
+    notes: "",
+    rating: 0,
+    status,
+    title: raw.title,
+    userId: "",
+  };
+};
+const gameToItemNormalizer = (raw: Game, status: ItemStatus): Item => {
+  return {
+    category: raw.category,
+    externalId: raw.slug,
+    link: `https://rawg.io/games/${raw.slug}`,
+    notes: "",
+    rating: 0,
+    status,
+    title: raw.name,
+    userId: "",
+  };
+};
+
+export function ItemNormalizer(
+  raw: Book | Game | Film | FullMovie | FullTvShow,
+  status: ItemStatus,
+): Item {
+  if (raw.category === "book") {
+    return bookToItemNormalizer(raw, status);
+  }
+  if (raw.category === "game") {
+    return gameToItemNormalizer(raw, status);
+  }
+  return filmtoItemNormalizer(raw, status);
+}

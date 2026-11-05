@@ -129,7 +129,7 @@ export const deleteItem = async (req, res) => {
         .status(404)
         .json({ error: "This item wasn't found, nothing was deleted." });
     }
-    res.status(204).send();
+    res.status(204).send({ message: "success" });
   } catch (error) {
     res.status(500).json({ error: `Server error ${error.message}` });
     console.error(error);

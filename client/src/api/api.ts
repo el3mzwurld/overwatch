@@ -250,27 +250,9 @@ export async function searchGame(
 }
 
 // library endpoints (these need a token)
-export async function createItem({
-  category,
-  title,
-  notes,
-  externalId,
-  link,
-}: {
-  category: string;
-  title: string;
-  notes?: string;
-  externalId: string;
-  link: string;
-}): Promise<Item> {
-  const body = {
-    category,
-    title,
-    notes,
-    externalId,
-    link,
-  };
-
+export async function createItem({ item }: { item: Item }): Promise<Item> {
+  const body = item;
+  console.log(body);
   try {
     const res = await axiosInstance.post("/items/add", body);
     return res.data.item;
@@ -301,6 +283,7 @@ export async function createItem({
   }
 }
 
+// items = library
 export async function fetchMyItems(
   category?: string,
   status?: string,
@@ -310,7 +293,7 @@ export async function fetchMyItems(
     const res = await axiosInstance.get("/items/lib", {
       params: { category, status },
     });
-    const data: Item[] = res.data.items;
+    const data: Item[] = res.data;
     return data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -320,5 +303,39 @@ export async function fetchMyItems(
       `Error : ${(error as Error).message}, Cause : ${(error as Error).cause}`,
     );
     throw new Error("We couldn't get your items", { cause: error });
+  }
+}
+
+export async function deleteItem(id: Item["externalId"]) {
+  try {
+    const res = await axiosInstance.delete(`/items/delete/${id}`);
+    if (res.data.message !== "success")
+      return { success: false, error: "We hit a snag deleting this for you" };
+
+    return { success: true };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      if (status === 404) {
+        return {
+          success: false,
+          error: "You don't have this item in your library",
+        };
+      }
+      if (status === 401) {
+        throw new Error(
+          "Unauthenticated : You need an account to perform this action",
+          { cause: error },
+        );
+      }
+      throw new Error(
+        "Unauthenticated : You need an account to perform this action",
+        { cause: error },
+      );
+    }
+    console.error(
+      `Error : ${(error as Error).message}, Cause : ${(error as Error).cause}`,
+    );
+    throw new Error("We couldn't create this item", { cause: error });
   }
 }

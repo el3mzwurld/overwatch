@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import type { Item } from "../assets/lib/types";
 import { LibraryTray } from "../components/ui/LibraryTray";
+import useLibrary from "../hooks/useLibrary";
 
 const placeholderItems: Item[] = [
   {
@@ -36,6 +37,8 @@ const placeholderItems: Item[] = [
 ];
 
 export const Library = () => {
+  const { library } = useLibrary();
+  console.log(library);
   return (
     <Box
       sx={{
@@ -56,7 +59,7 @@ export const Library = () => {
       <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
         Library
       </Typography>
-      <LibraryTray items={placeholderItems} />
+      <LibraryTray items={library} />
     </Box>
   );
 };
