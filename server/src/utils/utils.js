@@ -92,7 +92,7 @@ export const normalizeFullMovie = (movie) => {
   const normalized = {
     externalId: `movie-${movie.id}`,
     category: "movie",
-    title: movie.name,
+    title: movie.title,
     releaseDate: movie.release_date,
     posterUrl: movie.poster_path ? `${TMDB_IMG_URL}${movie.poster_path}` : null,
     backdrop: movie.backdrop_path
