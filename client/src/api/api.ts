@@ -29,11 +29,15 @@ const removeObjectsWithNullValues = <T extends object>(items: T[]): T[] =>
   items.filter((item) => Object.values(item).every((value) => value !== null));
 
 // film endpoints
-export async function discoverFilms(): Promise<Film[]> {
+export async function discoverFilms(
+  pageParam: number,
+): Promise<{ result: Film[]; nextPage: number }> {
   try {
-    const res = await axiosInstance.get("/items/films");
+    const res = await axiosInstance.get("/items/films", {
+      params: { page: pageParam },
+    });
     const data: DiscoverFilmReturn = res.data;
-    return data.films;
+    return { result: data.films, nextPage: pageParam + 1 };
   } catch (error) {
     console.error("We encountered a hitch fetching your data", error);
     throw new Error("Failed to fetch films", { cause: error });

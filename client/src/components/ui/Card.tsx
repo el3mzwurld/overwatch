@@ -82,7 +82,7 @@ export const DiscoveryCard = (props: CardProps) => {
       viewport={{ once: true, amount: 0.3 }}
       sx={{
         width: { xs: "100%", md: "80%" },
-        height: { xs: "20em", md: "25em" },
+        height: { xs: "20em", md: "22em" },
         backgroundColor: "background.paper",
         borderRadius: 2.25,
         overflow: "hidden",

@@ -1,87 +1,228 @@
-import { OpenInNewRounded } from "@mui/icons-material";
+import type { ReactNode } from "react";
 import {
-  Button,
-  Chip,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+  ArrowForwardRounded,
+  AutoStoriesRounded,
+  CheckCircleRounded,
+  GamepadRounded,
+  LocalMoviesRounded,
+  OpenInNewRounded,
+  PauseCircleRounded,
+  PlaylistAddRounded,
+  RemoveCircleRounded,
+  TvRounded,
+} from "@mui/icons-material";
+import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import type { Item } from "../../assets/lib/types";
 
 type UserItemProps = {
   item: Item;
 };
 
-const formatCategory = (category: Item["category"]) =>
-  category === "tv" ? "TV" : category.charAt(0).toUpperCase() + category.slice(1);
+const categoryDetails = {
+  book: { label: "Book", icon: <AutoStoriesRounded />, color: "#7b61a8" },
+  game: { label: "Game", icon: <GamepadRounded />, color: "#397d74" },
+  movie: { label: "Film", icon: <LocalMoviesRounded />, color: "#a75b48" },
+  tv: { label: "TV series", icon: <TvRounded />, color: "#5275a2" },
+} satisfies Record<
+  Item["category"],
+  { label: string; icon: ReactNode; color: string }
+>;
 
-export const UserItem = ({ item }: UserItemProps) => (
-  <Paper
-    component="article"
-    variant="outlined"
-    sx={{
-      height: "100%",
-      p: { xs: 2, sm: 2.5 },
-      borderRadius: 0,
-      bgcolor: "background.default",
-    }}
-  >
-    <Stack
-      spacing={1.5}
-      sx={{ height: "100%", alignItems: "flex-start", minWidth: 0 }}
+const statusDetails = {
+  want: {
+    label: "Want to explore",
+    color: "#5275a2",
+    background: "rgba(82, 117, 162, 0.12)",
+    icon: <PlaylistAddRounded />,
+  },
+  "in progress": {
+    label: "In progress",
+    color: "#a77825",
+    background: "rgba(167, 120, 37, 0.14)",
+    icon: <PauseCircleRounded />,
+  },
+  finished: {
+    label: "Finished",
+    color: "#4b8061",
+    background: "rgba(75, 128, 97, 0.14)",
+    icon: <CheckCircleRounded />,
+  },
+  dropped: {
+    label: "Dropped",
+    color: "#a95858",
+    background: "rgba(169, 88, 88, 0.13)",
+    icon: <RemoveCircleRounded />,
+  },
+} satisfies Record<
+  Item["status"],
+  { label: string; color: string; background: string; icon: ReactNode }
+>;
+
+export const UserItem = ({ item }: UserItemProps) => {
+  const category = categoryDetails[item.category];
+  const status = statusDetails[item.status];
+  const itemPath = `/library/${encodeURIComponent(item.externalId)}`;
+
+  return (
+    <Paper
+      component="article"
+      variant="outlined"
+      sx={{
+        height: "100%",
+        minHeight: 230,
+        overflow: "hidden",
+        borderRadius: 3,
+        transition: "transform 180ms ease, box-shadow 180ms ease",
+        "&:hover": {
+          transform: "translateY(-3px)",
+          boxShadow: 4,
+        },
+      }}
     >
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{
-          width: "100%",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Chip size="small" label={formatCategory(item.category)} variant="outlined" />
-        <Chip size="small" label={item.status} />
-      </Stack>
-
-      <Typography
-        component="h3"
-        variant="h6"
-        sx={{ fontWeight: 600, overflowWrap: "anywhere" }}
-      >
-        {item.title}
-      </Typography>
-
-      <Typography variant="body2" color="text.secondary">
-        {item.rating > 0 ? `Your rating · ${item.rating}/10` : "Not rated"}
-      </Typography>
-
-      {item.notes && (
-        <Typography
-          variant="body2"
-          color="text.secondary"
+      <Stack direction="row" sx={{ height: "100%", minHeight: 230 }}>
+        <Box
+          aria-hidden="true"
           sx={{
-            display: "-webkit-box",
-            overflow: "hidden",
-            WebkitBoxOrient: "vertical",
-            WebkitLineClamp: 3,
+            width: { xs: 68, sm: 82 },
+            flexShrink: 0,
+            display: "grid",
+            placeItems: "center",
+            color: "#fff",
+            bgcolor: category.color,
+            "& svg": { fontSize: { xs: 30, sm: 36 } },
           }}
         >
-          {item.notes}
-        </Typography>
-      )}
+          {category.icon}
+        </Box>
 
-      {item.link && (
-        <Button
-          href={item.link}
-          target="_blank"
-          rel="noreferrer"
-          endIcon={<OpenInNewRounded />}
-          size="small"
-          sx={{ mt: "auto", px: 0, textTransform: "none" }}
+        <Stack
+          spacing={1.5}
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: { xs: 1.75, sm: 2.25 },
+            alignItems: "stretch",
+          }}
         >
-          View details
-        </Button>
-      )}
-    </Stack>
-  </Paper>
-);
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Chip
+              size="small"
+              label={category.label}
+              variant="outlined"
+              sx={{ maxWidth: "48%", borderRadius: 1.5 }}
+            />
+            <Chip
+              size="small"
+              icon={status.icon}
+              label={status.label}
+              sx={{
+                maxWidth: "70%",
+                color: status.color,
+                bgcolor: status.background,
+                borderRadius: 1.5,
+                "& .MuiChip-icon": { color: "inherit" },
+                "& .MuiChip-label": {
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                },
+              }}
+            />
+          </Stack>
+
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              component={RouterLink}
+              to={itemPath}
+              variant="h6"
+              sx={{
+                display: "-webkit-box",
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
+                color: "text.primary",
+                fontWeight: 700,
+                lineHeight: 1.3,
+                textDecoration: "none",
+                overflowWrap: "anywhere",
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >
+              {item.title}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: 0.75 }}
+            >
+              {item.rating > 0
+                ? `Your rating · ${item.rating}/10`
+                : "Not rated yet"}
+            </Typography>
+          </Box>
+
+          {item.notes ? (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                display: "-webkit-box",
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
+                lineHeight: 1.5,
+              }}
+            >
+              {item.notes}
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.disabled">
+              No notes added
+            </Typography>
+          )}
+
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={0.75}
+            sx={{ mt: "auto", pt: 0.5 }}
+          >
+            <Button
+              component={RouterLink}
+              to={itemPath}
+              size="small"
+              variant="contained"
+              endIcon={<ArrowForwardRounded />}
+              sx={{ flex: 1, textTransform: "none", borderRadius: 2 }}
+            >
+              Manage item
+            </Button>
+            {item.link && (
+              <Button
+                component="a"
+                href={item.link}
+                target="_blank"
+                rel="noreferrer"
+                size="small"
+                variant="outlined"
+                endIcon={<OpenInNewRounded />}
+                sx={{
+                  flex: 1,
+                  textTransform: "none",
+                  borderRadius: 2,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                External page
+              </Button>
+            )}
+          </Stack>
+        </Stack>
+      </Stack>
+    </Paper>
+  );
+};

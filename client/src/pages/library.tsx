@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import type { Item } from "../assets/lib/types";
 import { LibraryTray } from "../components/ui/LibraryTray";
 import useLibrary from "../hooks/useLibrary";
+import { Header } from "./landing";
 
 const placeholderItems: Item[] = [
   {
@@ -40,26 +41,31 @@ export const Library = () => {
   const { library } = useLibrary();
   console.log(library);
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: 1200,
-        mx: "auto",
-        px: { xs: 2, sm: 3 },
-        py: 4,
-      }}
-    >
-      <Typography
-        variant="overline"
-        color="text.secondary"
-        sx={{ letterSpacing: "0.16em" }}
+    <>
+      <Header />
+      <Box
+        component={"main"}
+        sx={{
+          width: "100%",
+          maxWidth: 1200,
+          mx: "auto",
+          px: { xs: 2, sm: 3 },
+          py: 4,
+          mt: 3.35,
+        }}
       >
-        YOUR SPACE
-      </Typography>
-      <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-        Library
-      </Typography>
-      <LibraryTray items={library} />
-    </Box>
+        <Typography
+          variant="overline"
+          color="text.secondary"
+          sx={{ letterSpacing: "0.16em" }}
+        >
+          YOUR SPACE
+        </Typography>
+        <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+          Library
+        </Typography>
+        <LibraryTray items={library} />
+      </Box>
+    </>
   );
 };

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { discoverFilms, getMovie, getShow } from "../api/api";
 import { useCallback, useMemo, useState } from "react";
 import { DISCOVERY_PAGE_LIMIT, paginator } from "../assets/lib/utils";
@@ -6,14 +6,27 @@ import type { Film, FullMovie, FullTvShow } from "../assets/lib/types";
 
 export const useDiscoverFilms = () => {
   const [page, setPage] = useState(1);
+  const [gameLoading, setGameLoading] = useState(false);
+  const q = useInfiniteQuery({
+    queryKey: ["discover-films", page],
+    queryFn: ({ pageParam }) => discoverFilms(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (last) => {
+      if (!last || last.result.length === 0) {
+        return undefined;
+      }
 
-  const q = useQuery({
-    queryKey: ["discover-films"],
-    queryFn: () => discoverFilms(),
-    retry: 2,
+      return last.nextPage;
+    },
   });
 
-  const films = q.data ?? [];
+  const results = useMemo(() => {
+    return q.data?.pages ?? [];
+  }, [q.data]);
+
+  const flatFilms = useMemo(() => {
+    return results ? results.flatMap((r) => r.result) : [];
+  }, [results]);
   // Keep the selected film stable when the results array changes.
   const findFilm = useCallback(
     async (id?: Film["externalId"]): Promise<FullMovie | FullTvShow | null> => {
@@ -33,13 +46,13 @@ export const useDiscoverFilms = () => {
   );
 
   return {
-    films: paginator(films, page, DISCOVERY_PAGE_LIMIT),
+    films: flatFilms,
     findFilm,
-    isLoading: q.isLoading,
+    isLoading: q.isLoading && q.isFetchingNextPage,
     isPending: q.isPending,
     error: q.error,
-    hasMore: page * DISCOVERY_PAGE_LIMIT < films.length,
-    loadMore: () => setPage((p) => p + 1),
+    loadMore: () => q.fetchNextPage(),
     page,
+    hasMore: q.hasNextPage,
   };
 };

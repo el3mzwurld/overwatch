@@ -8,6 +8,7 @@ import { Auth } from "./auth";
 import { Profile } from "./profile";
 import { Document } from "./document";
 import { CircularProgress } from "@mui/material";
+import { ItemPage } from "../components/ui/ItemPage";
 
 // check if a user is logged in..if not, return them to the authentication screen
 
@@ -42,7 +43,7 @@ export const Approuter = () => {
         {/* only authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route path="library" element={<Library />} />
-          <Route path="library/:id" />
+          <Route path="library/:id" element={<ItemPage />} />
           <Route path="profile" element={<Profile />} />
         </Route>
       </Route>

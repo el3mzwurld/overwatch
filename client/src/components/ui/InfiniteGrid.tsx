@@ -211,7 +211,15 @@ export const InfiniteGrid = () => {
           <>
             {displayedData.map((data, index) =>
               !data ? (
-                <div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "50vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   {
                     <ErrorBoundary
                       category={cat}
@@ -286,6 +294,28 @@ export const InfiniteGrid = () => {
                       aria-label="data loading..."
                     />
                   ) : discoverBook.hasMore ? (
+                    "Load More"
+                  ) : null}
+                </div>
+              )}
+              {cat === "films" && (
+                <div
+                  ref={loadMoreRef}
+                  style={{
+                    width: "100%",
+                    padding: "1em 1em",
+                    display: "flex",
+                    justifyContent: "center",
+                    color: "secondary.main",
+                  }}
+                >
+                  {discoverFilm.isLoading ? (
+                    <CircularProgress
+                      size={"1.25em"}
+                      color="secondary"
+                      aria-label="data loading..."
+                    />
+                  ) : discoverGames.hasMore ? (
                     "Load More"
                   ) : null}
                 </div>

@@ -46,6 +46,8 @@ export const Header = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        borderBottom: "1px solid",
+        borderColor: "divider",
       }}
     >
       <div style={{ height: "100%", flex: 1 }}>

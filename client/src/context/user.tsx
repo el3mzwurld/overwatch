@@ -52,6 +52,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   async function login(email: string, password: string): Promise<AuthResponse> {
     setIsSubmitting(true);
+    setError(undefined);
     const body = {
       email,
       password,
@@ -60,15 +61,23 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const response = await axiosInstance.post("/auth/login", body);
       const data: LoginResponse = await response.data;
       setToken(data.token);
-      setUser(data.user);
+      setError(undefined);
       return {
         success: true,
       };
     } catch (error) {
-      setError((error as Error).message);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          setError("Invalid user details");
+          return { success: false, cause: "Invalid user details" };
+        }
+      }
+      const message =
+        "We were unable to authenticate you. It's a problem we're trying to solve.";
+      setError(message);
       return {
         success: false,
-        cause: (error as Error).message,
+        cause: message,
       };
     } finally {
       setIsSubmitting(false);
@@ -81,6 +90,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     password: string,
   ): Promise<AuthResponse> {
     setIsSubmitting(true);
+    setError(undefined);
     const body = {
       email,
       userName: username,
@@ -90,14 +100,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       await axiosInstance.post("/auth/reg", body);
 
+      setError(undefined);
       return {
         success: true,
       };
     } catch (error) {
-      setError((error as Error).message);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          const message = "This email is already assigned to another user.";
+          setError(message);
+          return { success: false, cause: message };
+        }
+      }
+      const message =
+        "We were unable to authenticate you. It's a problem we're trying to solve.";
+      setError(message);
       return {
         success: false,
-        cause: (error as Error).message,
+        cause: message,
       };
     } finally {
       setIsSubmitting(false);
@@ -116,14 +136,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await axiosInstance.get("/auth/me");
       const userData = response.data;
-      console.log(userData);
       setUser(userData.user);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          // deleteToken();
           console.log("not authorized from backend");
+          setError("Unable to authenticate.");
           setUser(null);
+          deleteToken();
         } else {
           setError("Server Error : There seems to be an issue on our end");
           console.error(error.message, error.cause);
