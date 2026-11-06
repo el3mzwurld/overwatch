@@ -2,6 +2,7 @@ import {
   DISCOVER_SUBJECTS,
   normalikeBook,
   normalizeSearchedBook,
+  normalizeSingleBook,
 } from "../utils/utils.js";
 const BASE_URL = "https://openlibrary.org";
 
@@ -67,7 +68,7 @@ export const getBook = async (req, res) => {
     const ratings = await fetchOpenLib(rating_endpoint);
     const authors = await fetchOpenLib(`${data.authors[0].author.key}.json`);
 
-    const normalized = normalikeBook(data);
+    const normalized = normalizeSingleBook(data);
     normalized.metadata.averageRating = ratings?.summary?.average;
     normalized.metadata.ratingsCount = ratings?.summary?.count;
     normalized.authors = authors.name;
