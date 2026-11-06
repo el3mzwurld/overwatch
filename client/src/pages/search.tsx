@@ -17,20 +17,18 @@ import { SearchCard } from "../components/ui/Card";
 import { UseBookSearch } from "../hooks/useBookSearch";
 import { useFilmSearch } from "../hooks/useFilmSearch";
 import { useGameSearch } from "../hooks/useGameSearch";
+import { useNavigate } from "react-router-dom";
 export const Search = () => {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<Category | null>(null);
   const books = UseBookSearch(query);
   const films = useFilmSearch(query);
-  const games = useGameSearch(query);
   const hasQuery = query.trim().length > 1;
-  const isSearching =
-    hasQuery && (books.isPending || films.isPending || games.isPending);
-
+  const isSearching = hasQuery && (books.isPending || films.isPending);
+  const nav = useNavigate();
   const categories: { category: Category; count: number }[] = [
     { category: "films", count: films.items.length },
     { category: "books", count: books.books.length },
-    { category: "games", count: games.gameSearchResults.length },
   ];
 
   return (
@@ -216,7 +214,11 @@ export const Search = () => {
               {cat === "films" && films.items.length > 0 && (
                 <Grid container spacing={{ xs: 1.25, sm: 2 }}>
                   {films.items.map((film) => (
-                    <Grid key={film.externalId} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <Grid
+                      key={film.externalId}
+                      size={{ xs: 12, sm: 6, md: 4 }}
+                      onClick={() => nav(`/item/films/${film.externalId}`)}
+                    >
                       <SearchCard mode="result" cardData={film} />
                     </Grid>
                   ))}
@@ -225,31 +227,25 @@ export const Search = () => {
               {cat === "books" && books.books.length > 0 && (
                 <Grid container spacing={{ xs: 1.25, sm: 2 }}>
                   {books.books.map((book) => (
-                    <Grid key={book.externalId} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <Grid
+                      key={book.externalId}
+                      size={{ xs: 12, sm: 6, md: 4 }}
+                      onClick={() => nav(`/item/books/${book.externalId}`)}
+                    >
                       <SearchCard mode="result" cardData={book} />
                     </Grid>
                   ))}
                 </Grid>
               )}
-              {cat === "games" && games.gameSearchResults.length > 0 && (
-                <Grid container spacing={{ xs: 1.25, sm: 2 }}>
-                  {games.gameSearchResults.map((game) => (
-                    <Grid key={game.externalId} size={{ xs: 12, sm: 6, md: 4 }}>
-                      <SearchCard mode="result" cardData={game} />
-                    </Grid>
-                  ))}
-                </Grid>
-              )}
+
               {((cat === "films" && films.error) ||
-                (cat === "books" && books.error) ||
-                (cat === "games" && games.error)) && (
+                (cat === "books" && books.error)) && (
                 <Alert severity="error">Search failed. Please try again.</Alert>
               )}
               {((cat === "films" && films.items.length === 0 && !films.error) ||
-                (cat === "books" && books.books.length === 0 && !books.error) ||
-                (cat === "games" &&
-                  games.gameSearchResults.length === 0 &&
-                  !games.error)) && (
+                (cat === "books" &&
+                  books.books.length === 0 &&
+                  !books.error)) && (
                 <Typography color="text.secondary">
                   No results found in this category.
                 </Typography>

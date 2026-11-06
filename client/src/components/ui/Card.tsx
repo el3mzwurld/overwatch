@@ -185,9 +185,7 @@ export const SearchCard = ({
       sx={{
         width: { xs: "100%" },
         minHeight:
-          mode === "category"
-            ? { xs: 84, sm: 96 }
-            : { xs: 112, sm: 128 },
+          mode === "category" ? { xs: 84, sm: 96 } : { xs: 112, sm: 140 },
         position: "relative",
         overflow: "hidden",
         alignItems: "center",
@@ -213,7 +211,10 @@ export const SearchCard = ({
       tabIndex={mode === "category" ? 0 : undefined}
       onClick={() => category && onClick?.(category)}
       onKeyDown={(event) => {
-        if (mode === "category" && (event.key === "Enter" || event.key === " ")) {
+        if (
+          mode === "category" &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
           event.preventDefault();
           if (category) onClick?.(category);
         }

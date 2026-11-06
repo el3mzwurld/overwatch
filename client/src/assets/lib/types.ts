@@ -68,7 +68,7 @@ export type Book = {
   externalId: string;
   category: "book";
   title: string;
-  authors: string[];
+  authors: string;
   publishDate: number;
   genres: string[];
   images: string | string[] | { thumbnail: string } | null;

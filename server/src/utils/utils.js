@@ -138,6 +138,31 @@ export const normalikeBook = (work) => {
     },
   };
 };
+export const normalizeSingleBook = (work) => {
+  const id = work.key.trim().split("/")[2];
+  return {
+    externalId: id, //"/works/OL16813053W"
+    category: "book",
+    title: work.title,
+    authors: work.authors?.map((a) => a.name) || [],
+    publishDate: work.first_publish_year
+      ? String(work.first_publish_year)
+      : work.first_publish_date
+        ? work.first_publish_date
+        : null,
+    genres: work.subject || work.subjects || [],
+    images: {
+      thumbnail: `https://covers.openlibrary.org/b/id/${work.covers[0]}-M.jpg`,
+    },
+    externalUrl: `https://openlibrary.org${work.key}`,
+    bookDesc: "", // not present on this endpoint — filled in via getBookById
+    pageCount: null, // not present here either
+    metadata: {
+      averageRating: null, // requires separate ratings call
+      ratingsCount: null,
+    },
+  };
+};
 export const normalizeSearchedBook = (work) => {
   const normalized = {
     author: work.author_name,

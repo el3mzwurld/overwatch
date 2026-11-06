@@ -1,13 +1,14 @@
 import {
   AddRounded,
   ArrowBackRounded,
+  CalendarMonthRounded,
   OpenInNewRounded,
+  StarRounded,
 } from "@mui/icons-material";
 import {
   Box,
   Button,
   Chip,
-  Divider,
   Dialog,
   DialogActions,
   DialogContent,
@@ -23,9 +24,11 @@ import {
 import { useState } from "react";
 import type { Book, FullMovie, FullTvShow, Game } from "../../assets/lib/types";
 import placeholder from "/img/logo-alt.png";
-import { MovieGenreMapper, TVGenreMapper } from "../../assets/lib/utils";
 import useLibrary from "../../hooks/useLibrary";
-import { useUser } from "../../context/user";
+import { BookContent } from "./BookContent";
+import { FilmContent } from "./FilmContent";
+import { GameContent } from "./GameContent";
+import { Navigate, useNavigate } from "react-router-dom";
 
 type ContentData = Book | FullMovie | FullTvShow | Game;
 type LibraryStatus = "want" | "in progress" | "finished";
@@ -39,29 +42,26 @@ const getTitle = (content: ContentData) =>
   content.category === "game" ? content.name : content.title;
 
 const getImage = (content: ContentData) => {
-  if (content.category === "game") {
-    return content.image || placeholder;
-  }
+  if (content.category === "game") return content.image || placeholder;
   if (content.category === "book") {
-    if (Array.isArray(content.images)) {
-      return content.images[0] ?? placeholder;
-    }
+    if (Array.isArray(content.images)) return content.images[0] || placeholder;
     if (typeof content.images === "string") {
-      return content.images ?? placeholder;
+      return content.images.includes("undefined")
+        ? placeholder
+        : content.images;
     }
-    return content.images?.thumbnail ?? placeholder;
+    if (content.images?.thumbnail) {
+      return content.images.thumbnail.includes("undefined")
+        ? placeholder
+        : content.images.thumbnail;
+    }
+    return placeholder;
   }
   return content.posterUrl || placeholder;
 };
 
 const getReleaseDate = (content: ContentData) =>
   content.category === "book" ? content.publishDate : content.releaseDate;
-
-const getDescription = (content: ContentData) => {
-  if (content.category === "book") return content.bookDesc;
-  if (content.category === "game") return "";
-  return content.overview;
-};
 
 const getRating = (content: ContentData) => {
   if (content.category === "game") {
@@ -74,201 +74,271 @@ const getRating = (content: ContentData) => {
       ? `${content.metadata.averageRating.toFixed(1)} / 5`
       : null;
   }
-  return content.metadata.voteAverage
-    ? `${content.metadata.voteAverage.toFixed(1)} / 10`
+  const metadata =
+    (content as FullMovie & { metadata?: FullMovie["metaData"] }).metadata ??
+    content.metaData;
+  return metadata?.voteAverage
+    ? `${metadata.voteAverage.toFixed(1)} / 10`
     : null;
 };
 
-const getGenres = (content: ContentData) => {
+const getGenres = (content: ContentData): string[] => {
   if (content.category === "game") {
     return content.genres.map((genre) => genre.name);
   }
-  if (content.category === "book") {
-    return content.genres;
-  }
-  return content.metaData?.genres.map((gen) => gen.name);
+  if (content.category === "book") return content.genres.slice(0, 4);
+  const metadata =
+    (content as FullMovie & { metadata?: FullMovie["metaData"] }).metadata ??
+    content.metaData;
+  return metadata?.genres?.map((genre) => genre.name) ?? [];
 };
 
-const getId = (content: ContentData) => {
-  if (content.category === "game") return content.slug;
+const getLibraryId = (content: ContentData) =>
+  content.category === "game" ? content.slug : content.externalId;
 
-  return content.externalId;
-};
+const getExternalUrl = (content: ContentData) =>
+  content.category === "game"
+    ? `https://rawg.io/games/${content.slug}`
+    : content.externalUrl;
 
 export const ContentPage = ({ content, onBack }: ContentPageProps) => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [status, setStatus] = useState<LibraryStatus>("want");
   const title = getTitle(content);
-  const description = getDescription(content);
+  const image = getImage(content);
   const rating = getRating(content);
-  const genres = getGenres(content) ?? [];
-  const externalUrl =
-    content.category === "book"
-      ? content.externalUrl
-      : content.category === "game"
-        ? undefined
-        : content.externalUrl;
-  console.log(title);
+  const genres = getGenres(content);
   const { isInLibrary, addToLibrary } = useLibrary();
+  const alreadyInLibrary = isInLibrary(title, getLibraryId(content));
+  console.log(content);
+  const nav = useNavigate();
+
   return (
     <Box
       component="main"
       sx={{
         width: "100%",
-        maxWidth: 1120,
+        maxWidth: 1320,
         mx: "auto",
-        p: { xs: 1.5, sm: 3, md: 4 },
+        px: { xs: 1.5, sm: 3, lg: 4 },
+        pb: { xs: 4, md: 6 },
       }}
     >
       {onBack && (
         <Button
           onClick={onBack}
           startIcon={<ArrowBackRounded />}
-          sx={{ mb: 2, px: 0, textTransform: "none" }}
+          sx={{ mb: { xs: 1.5, sm: 2 }, px: 0, textTransform: "none" }}
         >
           Back
         </Button>
       )}
 
       <Paper
-        variant="outlined"
+        elevation={0}
         sx={{
+          position: "relative",
+          isolation: "isolate",
           overflow: "hidden",
-          borderRadius: { xs: 2, sm: 3 },
-          bgcolor: "background.paper",
+          minHeight: { xs: 290, sm: 350, md: 410 },
+          borderRadius: { xs: 2.5, sm: 4 },
+          color: "#fff",
+          bgcolor: "#242321",
+          backgroundImage: `linear-gradient(90deg, rgba(20,19,18,.96) 0%, rgba(20,19,18,.82) 52%, rgba(20,19,18,.42) 100%), url("${image}")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            zIndex: -1,
+            backdropFilter: "blur(2px)",
+          },
         }}
       >
-        <Stack direction={{ xs: "column", md: "row" }}>
+        <Stack
+          direction={{ xs: "row", sm: "row" }}
+          spacing={{ xs: 2, sm: 3, md: 4 }}
+          sx={{
+            minHeight: { xs: 290, sm: 350, md: 410 },
+            p: { xs: 2, sm: 3.5, md: 5 },
+            background:
+              "linear-gradient(0deg, rgba(20,19,18,.56), transparent 70%)",
+            alignItems: "center",
+          }}
+        >
           <Box
             component="img"
-            src={getImage(content)}
+            src={image}
             alt={`${title} cover`}
+            onError={(event) => {
+              event.currentTarget.src = placeholder;
+            }}
             sx={{
               display: "block",
-              width: { xs: "100%", md: 320 },
-              height: { xs: 240, sm: 340, md: 460 },
+              flexShrink: 0,
+              width: { xs: 104, sm: 170, md: 225 },
+              height: { xs: 156, sm: 255, md: 338 },
               objectFit: "cover",
-              bgcolor: "action.hover",
+              borderRadius: { xs: 1.5, sm: 2 },
+              bgcolor: "rgba(255,255,255,.1)",
+              boxShadow: "0 16px 42px rgba(0,0,0,.4)",
             }}
           />
-
           <Stack
-            spacing={{ xs: 2, sm: 2.5 }}
-            sx={{ flex: 1, minWidth: 0, p: { xs: 2, sm: 3, md: 4 } }}
+            spacing={{ xs: 1.25, sm: 2 }}
+            sx={{ minWidth: 0, maxWidth: 760 }}
           >
-            <Box>
+            <Stack direction="row" spacing={0.75} sx={{ flexWrap: "wrap" }}>
               <Chip
                 size="small"
-                variant="outlined"
-                label={content.category === "tv" ? "TV" : content.category}
-                sx={{ mb: 1.5, textTransform: "capitalize" }}
-              />
-              <Typography
-                component="h1"
-                variant="h4"
+                label={
+                  content.category === "tv" ? "TV series" : content.category
+                }
                 sx={{
-                  fontSize: { xs: "1.75rem", sm: "2.125rem" },
-                  fontWeight: 600,
-                  overflowWrap: "anywhere",
+                  bgcolor: "rgba(255,255,255,.14)",
+                  color: "inherit",
+                  textTransform: "capitalize",
+                }}
+              />
+              {content.category === "game" && content.esrbRating?.name && (
+                <Chip
+                  size="small"
+                  label={`ESRB ${content.esrbRating.name}`}
+                  sx={{ bgcolor: "rgba(255,255,255,.14)", color: "inherit" }}
+                />
+              )}
+            </Stack>
+            <Typography
+              component="h1"
+              sx={{
+                fontSize: { xs: "1.55rem", sm: "2.5rem", md: "3.25rem" },
+                fontWeight: 800,
+                lineHeight: 1.1,
+                overflowWrap: "anywhere",
+                textWrap: "balance",
+              }}
+            >
+              {title}
+            </Typography>
+            {content.category === "book" && content.authors.length > 0 && (
+              <Typography
+                variant="h6"
+                sx={{
+                  fontSize: { xs: "0.95rem", sm: "1.2rem" },
+                  opacity: 0.88,
                 }}
               >
-                {title}
-              </Typography>
-              <Typography color="text.secondary" sx={{ mt: 0.75 }}>
-                {getReleaseDate(content) || "Release date unavailable"}
-              </Typography>
-            </Box>
-
-            {rating && (
-              <Typography variant="body2" color="text.secondary">
-                Rating · {rating}
+                by {content.authors}
               </Typography>
             )}
-
-            {genres && genres.length > 0 && (
+            <Stack
+              direction="row"
+              spacing={{ xs: 0.75, sm: 1.25 }}
+              sx={{
+                color: "rgba(255,255,255,.82)",
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              {getReleaseDate(content) && (
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{ alignItems: "center" }}
+                >
+                  <CalendarMonthRounded sx={{ fontSize: 18 }} />
+                  <Typography variant="body2">
+                    {getReleaseDate(content)}
+                  </Typography>
+                </Stack>
+              )}
+              {rating && (
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{ alignItems: "center" }}
+                >
+                  <StarRounded sx={{ fontSize: 18 }} />
+                  <Typography variant="body2">{rating}</Typography>
+                </Stack>
+              )}
+            </Stack>
+            {genres.length > 0 && (
               <Stack
                 direction="row"
-                spacing={1}
-                useFlexGap
-                sx={{ flexWrap: "wrap" }}
+                spacing={0.75}
+                sx={{ pt: 0.25, flexWrap: "wrap" }}
               >
                 {genres.map((genre) => (
-                  <Chip key={genre} label={genre} size="small" />
+                  <Chip
+                    key={genre}
+                    label={genre}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      color: "inherit",
+                      borderColor: "rgba(255,255,255,.32)",
+                      bgcolor: "rgba(0,0,0,.12)",
+                    }}
+                  />
                 ))}
               </Stack>
             )}
-
-            <Divider />
-
-            <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                About
-              </Typography>
-              <Typography
-                color={description ? "text.primary" : "text.secondary"}
-                sx={{ whiteSpace: "pre-line", lineHeight: 1.75 }}
-              >
-                {description || "No description available yet."}
-              </Typography>
-            </Box>
-
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={1.25}
-              useFlexGap
-              sx={{ mt: "auto", pt: 1, flexWrap: "wrap" }}
-            >
-              {isInLibrary(title, getId(content)) ? (
-                <Button
-                  variant="contained"
-                  startIcon={<AddRounded />}
-                  sx={{
-                    alignSelf: { sm: "flex-start" },
-                    borderRadius: 2,
-                    textTransform: "none",
-                    py: 1.5,
-                  }}
-                >
-                  View In Library
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setIsAddDialogOpen(true)}
-                  variant="contained"
-                  startIcon={<AddRounded />}
-                  sx={{
-                    alignSelf: { sm: "flex-start" },
-                    borderRadius: 2,
-                    textTransform: "none",
-                    py: 1.5,
-                  }}
-                >
-                  Add to library
-                </Button>
-              )}
-              {externalUrl && (
-                <Button
-                  href={externalUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  variant="outlined"
-                  endIcon={<OpenInNewRounded />}
-                  sx={{
-                    alignSelf: { sm: "flex-start" },
-                    borderRadius: 2,
-                    textTransform: "none",
-                    color: "text.primary",
-                    borderColor: "divider",
-                    py: 1.5,
-                  }}
-                >
-                  More information
-                </Button>
-              )}
-            </Stack>
           </Stack>
         </Stack>
       </Paper>
+
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={1.25}
+        sx={{ my: 2.5 }}
+      >
+        {alreadyInLibrary ? (
+          <Button
+            variant="contained"
+            sx={{ borderRadius: 2, textTransform: "none", py: 1.25 }}
+            onClick={() => {
+              nav("/library");
+            }}
+          >
+            View in library
+          </Button>
+        ) : (
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            variant="contained"
+            startIcon={<AddRounded />}
+            sx={{ borderRadius: 2, textTransform: "none", py: 1.25 }}
+          >
+            Add to library
+          </Button>
+        )}
+        <Button
+          href={getExternalUrl(content)}
+          target="_blank"
+          rel="noreferrer"
+          variant="outlined"
+          endIcon={<OpenInNewRounded />}
+          sx={{
+            borderRadius: 2,
+            textTransform: "none",
+            color: "text.primary",
+            borderColor: "divider",
+            py: 1.25,
+          }}
+        >
+          More information
+        </Button>
+      </Stack>
+
+      {content.category === "book" ? (
+        <BookContent content={content} />
+      ) : content.category === "game" ? (
+        <GameContent content={content} />
+      ) : (
+        <FilmContent content={content} />
+      )}
 
       <Dialog
         open={isAddDialogOpen}
@@ -280,7 +350,7 @@ export const ContentPage = ({ content, onBack }: ContentPageProps) => {
         <DialogTitle id="add-to-library-title">Add to your library</DialogTitle>
         <DialogContent>
           <Typography color="text.secondary" sx={{ mb: 2 }}>
-            Let's know where you're on with {title}.
+            Let&apos;s know where you&apos;re on with {title}.
           </Typography>
           <FormControl fullWidth>
             <InputLabel id="library-status-label">Status</InputLabel>
