@@ -50,9 +50,9 @@ router.post("/add", reqAuth, createItem);
 // get all items
 router.get("/lib", reqAuth, fetchItems);
 // patch an item
-router.patch("/edit/:id", updateItem);
+router.patch("/edit/:id", reqAuth, updateItem);
 // delete an item
-router.delete("/delete/:id", deleteItem);
+router.delete("/delete/:id", reqAuth, deleteItem);
 // get by id
 router.get("/:id", getById);
 

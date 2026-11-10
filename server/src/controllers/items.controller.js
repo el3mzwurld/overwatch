@@ -78,7 +78,11 @@ export const createItem = async (req, res) => {
 
 export const updateItem = async (req, res) => {
   const userId = req.user.id;
-  const { id } = req.params;
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(200).json({ error: "Bad request" });
+  }
   // editable fields are only rating status and notes
   const { status, rating, notes } = req.body;
   const updatedItem = {};
@@ -96,12 +100,13 @@ export const updateItem = async (req, res) => {
     });
   }
 
-  if (status) updatedItem.status = status;
-  if (rating) updatedItem.rating = rating;
-  if (notes) updatedItem.notes = notes;
+  if (status !== undefined) updatedItem.status = status;
+  if (rating !== undefined) updatedItem.rating = rating;
+  if (notes !== undefined && notes.trim().length !== 0)
+    updatedItem.notes = notes;
   try {
     const update = await Item.findOneAndUpdate(
-      { _id: id, userId: userId },
+      { externalId: id, userId: userId },
       { $set: updatedItem },
       { new: true },
     );
