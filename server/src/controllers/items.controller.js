@@ -111,7 +111,7 @@ export const updateItem = async (req, res) => {
       });
     }
 
-    res.status(200).json({ item: update });
+    res.status(200).json({ item: update, success: true });
   } catch (error) {
     res.status(500).json({ error: `Server error ${error.message}` });
     console.error(error);
