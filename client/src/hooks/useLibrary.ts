@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   Book,
   Film,
@@ -7,9 +7,8 @@ import type {
   Game,
   Item,
   ItemStatus,
-  User,
 } from "../assets/lib/types";
-import { createItem, deleteItem, fetchMyItems } from "../api/api";
+import { createItem, deleteItem, fetchMyItems, updateItem } from "../api/api";
 import { ItemNormalizer } from "../assets/lib/utils";
 import { useState } from "react";
 
@@ -19,6 +18,7 @@ import { useState } from "react";
 
 export default function useLibrary() {
   const [actionError, setActionError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const lib = useQuery({
     queryKey: ["library"],
     queryFn: () => fetchMyItems(), // no need for category or status, filtering can happen client side with little to no latency to it
@@ -50,7 +50,6 @@ export default function useLibrary() {
       if (!res.success) throw new Error(res.error ?? "");
       return res.success;
     } catch (error) {
-      // fail silently
       console.error((error as Error).message);
       setActionError((error as Error).message);
       return false;
@@ -65,6 +64,33 @@ export default function useLibrary() {
     return isInLibrary ? true : false;
   }
 
+  async function updateMyItem(
+    {
+      rating,
+      status,
+      notes,
+    }: { rating: number; status: ItemStatus; notes: string },
+    item: Item,
+  ): Promise<boolean> {
+    if (
+      item.notes === notes &&
+      item.status === status &&
+      item.rating === rating
+    ) {
+      return true;
+    }
+
+    try {
+      await updateItem(item.externalId, status, rating, notes);
+      await queryClient.invalidateQueries({ queryKey: ["library"] });
+      setActionError(null);
+      return true;
+    } catch (error) {
+      console.error("error:", error);
+      setActionError("Oops, we're having issues updating this item");
+      return false;
+    }
+  }
   return {
     library,
     isPending: lib.isPending,
@@ -73,5 +99,6 @@ export default function useLibrary() {
     removeItem,
     isInLibrary,
     actionError,
+    updateMyItem,
   };
 }

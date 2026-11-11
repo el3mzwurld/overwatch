@@ -199,7 +199,16 @@ export const UserItem = ({ item }: UserItemProps) => {
               endIcon={<ArrowForwardRounded />}
               sx={{ flex: 1, textTransform: "none", borderRadius: 2 }}
             >
-              Manage item
+              <p
+                style={{
+                  width: "70%",
+                  textWrap: "nowrap",
+                  textOverflow: "ellipsis",
+                  overflow: "clip",
+                }}
+              >
+                Manage
+              </p>
             </Button>
             {item.link && (
               <Button

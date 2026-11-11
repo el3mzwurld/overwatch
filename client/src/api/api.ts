@@ -343,3 +343,34 @@ export async function deleteItem(id: Item["externalId"]) {
     throw new Error("We couldn't create this item", { cause: error });
   }
 }
+
+export async function updateItem(
+  id: string,
+  status?: string,
+  rating?: number,
+  notes?: string,
+) {
+  try {
+    const res = await axiosInstance.patch(`/items/edit/${id}`, {
+      status,
+      rating,
+      notes,
+    });
+
+    if (!res.data.success)
+      throw new Error("failed to update item, server error.");
+
+    return true;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 400) {
+        throw new Error(
+          "Bad request: You need to choose a valid status or rating",
+          { cause: error },
+        );
+      }
+    }
+
+    throw new Error((error as Error).message, { cause: error });
+  }
+}

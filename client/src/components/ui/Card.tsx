@@ -86,6 +86,11 @@ export const DiscoveryCard = (props: CardProps) => {
         backgroundColor: "background.paper",
         borderRadius: 2.25,
         overflow: "hidden",
+        ":hover": {
+          ".title": {
+            textDecoration: "underline",
+          },
+        },
       }}
     >
       {/* img - 75% */}
@@ -113,7 +118,7 @@ export const DiscoveryCard = (props: CardProps) => {
           py: { xs: 1.5 },
         }}
       >
-        <Typography sx={{ fontSize: { xs: "0.8em" } }}>
+        <Typography sx={{ fontSize: { xs: "0.8em" } }} className="title">
           {title?.title}
         </Typography>
         <Typography sx={{ fontSize: { xs: "0.8em" } }}>
@@ -159,6 +164,7 @@ export const SearchCard = ({
     return cardData?.releaseDate.split("-")[0];
   };
   const date = releaseDate();
+
   const getImg = () => {
     if (isGameSearchResult(cardData)) {
       return cardData.image;
@@ -184,8 +190,7 @@ export const SearchCard = ({
       }}
       sx={{
         width: { xs: "100%" },
-        minHeight:
-          mode === "category" ? { xs: 84, sm: 96 } : { xs: 112, sm: 140 },
+        height: mode === "category" ? { xs: 84, sm: 96 } : { xs: 112, sm: 140 },
         position: "relative",
         overflow: "hidden",
         alignItems: "center",
@@ -196,7 +201,7 @@ export const SearchCard = ({
         borderRadius: 2.5,
         bgcolor: "background.paper",
         color: "text.primary",
-        cursor: mode === "category" ? "pointer" : "default",
+        cursor: "pointer",
         transition: "border-color 160ms ease",
         "&:hover": {
           borderColor: mode === "category" ? "text.secondary" : "divider",

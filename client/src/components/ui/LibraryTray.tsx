@@ -41,7 +41,7 @@ export const LibraryTray = ({ items }: LibraryTrayProps) => {
           mb: 2,
         }}
       >
-        <Stack direction="row" spacing={1.25} alignItems="center">
+        <Stack direction="row" spacing={1.25} sx={{ alignItens: "center" }}>
           <Typography component="h2" variant="h5" sx={{ fontWeight: 700 }}>
             Your collection
           </Typography>

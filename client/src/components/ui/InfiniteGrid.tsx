@@ -237,7 +237,11 @@ export const InfiniteGrid = () => {
                 <Grid
                   size={{ xs: 6, sm: 4, lg: 3 }}
                   key={index}
-                  sx={{ display: "flex", justifyContent: "center" }}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     const category: Category =
                       data.category === "movie" || data.category == "tv"

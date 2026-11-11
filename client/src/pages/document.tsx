@@ -49,7 +49,6 @@ export const Document = () => {
     }
 
     void fetchDoc();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, category]);
 
   if (!category || !id || !doc) {

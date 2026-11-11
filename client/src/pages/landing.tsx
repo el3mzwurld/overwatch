@@ -18,7 +18,7 @@ const Landing = () => {
       {/* header */}
       <Header />
       {/* infinite grid */}
-      <Box component={"main"} sx={{ width: "100%", height: "auto" }}>
+      <Box component={"main"} sx={{ width: "100%", height: "auto", mt: 2.5 }}>
         <InfiniteGrid />
       </Box>
     </Box>

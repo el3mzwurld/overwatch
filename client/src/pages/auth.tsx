@@ -24,9 +24,7 @@ export const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [notice, setNotice] = useState("");
   const passwordsDoNotMatch =
-    isRegistering &&
-    confirmPassword.length > 0 &&
-    password !== confirmPassword;
+    isRegistering && confirmPassword.length > 0 && password !== confirmPassword;
 
   if (!userContext) {
     return (
@@ -248,7 +246,9 @@ export const Auth = () => {
                     onChange={(event) => setConfirmPassword(event.target.value)}
                     error={passwordsDoNotMatch}
                     helperText={
-                      passwordsDoNotMatch ? "Passwords do not match." : undefined
+                      passwordsDoNotMatch
+                        ? "Passwords do not match."
+                        : undefined
                     }
                     required
                     fullWidth

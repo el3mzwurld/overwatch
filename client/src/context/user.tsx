@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import type { LoginResponse, User } from "../assets/lib/types";
 import { axiosInstance } from "../api/axiosInstance";
 import { deleteToken, getToken, setToken } from "../assets/lib/utils";
@@ -62,6 +56,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const data: LoginResponse = await response.data;
       setToken(data.token);
       setError(undefined);
+      await getCurrentProfile();
       return {
         success: true,
       };
@@ -131,7 +126,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setIsInitializing(false);
       return;
     }
-    console.log(typeof tok);
     setIsInitializing(true);
     try {
       const response = await axiosInstance.get("/auth/me");
